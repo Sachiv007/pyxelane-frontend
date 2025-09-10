@@ -69,10 +69,12 @@ function AppWrapper() {
           <Route path="/product/:id" element={<ProductDetails />} />
 
           {/* ✅ Checkout Routes */}
-          <Route path="/checkout" element={<Checkout />} />           {/* Buy Now works with state */}
-          <Route path="/checkout/:productId" element={<Checkout />} /> {/* Optional legacy / cart link */}
+          <Route path="/checkout" element={<Checkout />} />           
+          <Route path="/checkout/:productId" element={<Checkout />} /> 
 
+          {/* ✅ Thank You Route */}
           <Route path="/thank-you/:productId" element={<ThankYou />} />
+
           <Route path="/cart" element={<Cart />} />
 
           {/* Protected User Routes */}
@@ -90,6 +92,9 @@ function AppWrapper() {
             <Route path="edit-product/:id" element={<EditProduct user={user} />} />
             <Route path="mystats" element={<MyStats user={user} />} />
           </Route>
+
+          {/* Catch-all route for React Router (Render deployment) */}
+          <Route path="*" element={<Navigate to="/" />} />
         </Routes>
       </UserProvider>
     </CartProvider>

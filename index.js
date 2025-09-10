@@ -1,55 +1,123 @@
-import express from 'express';
-import cors from 'cors';
-import multer from 'multer';
-import path from 'path';
+import React, { useEffect, useState } from "react";
+import { createRoot } from "react-dom/client";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+  useLocation,
+  useNavigate
+} from "react-router-dom";
+import { supabase } from "./supabaseClient";
 
-const app = express();
-const PORT = process.env.PORT || 5000;
+import { CartProvider } from "./contexts/CartContext";
+import { UserProvider } from "./contexts/UserContext";
+import Navbar from "./components/Navbar";
 
-// Enable CORS for both local and deployed frontend
-const allowedOrigins = [
-  'http://localhost:5173', // local dev
-  'https://pyxelane-frontend.onrender.com' // render frontend
-];
+import Home from "./pages/Home";
+import Login from "./pages/Login";
+import SignUp from "./pages/SignUp";
+import VerifyEmail from "./pages/VerifyEmail";
+import ResetPassword from "./pages/ResetPassword";
+import UserDashboard from "./pages/UserDashboard";
+import MyAccount from "./pages/MyAccount";
+import Products from "./pages/Products";
+import UploadProduct from "./pages/UploadProduct";
+import EditProduct from "./pages/EditProduct";
+import ProductDetails from "./pages/ProductDetails";
+import Checkout from "./pages/Checkout";
+import ThankYou from "./pages/ThankYou";
+import Cart from "./pages/Cart";
+import MyStats from "./pages/MyStats";
 
-app.use(cors({
-  origin: (origin, callback) => {
-    // allow requests with no origin (like mobile apps, curl)
-    if (!origin) return callback(null, true);
-    if (allowedOrigins.includes(origin)) {
-      return callback(null, true);
-    }
-    return callback(new Error('Not allowed by CORS'));
-  },
-  credentials: true,
-}));
+function AppWrapper() {
+  const navigate = useNavigate();
+  const location = useLocation();
+  const [user, setUser] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
 
-// Serve uploaded images statically from /uploads
-app.use('/uploads', express.static('uploads'));
+  useEffect(() => {
+    // Fetch session on load
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUser(session?.user ?? null);
+      setLoading(false);
+    });
 
-// Configure multer storage
-const storage = multer.diskStorage({
-  destination: (req, file, cb) => {
-    cb(null, 'uploads/');
-  },
-  filename: (req, file, cb) => {
-    const ext = path.extname(file.originalname);
-    cb(null, `${Date.now()}${ext}`);
-  }
-});
+    const { data: authListener } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        setUser(session?.user ?? null);
+        if (event === "PASSWORD_RECOVERY") {
+          navigate("/reset-password");
+        }
+      }
+    );
 
-const upload = multer({ storage });
+    return () => authListener.subscription.unsubscribe();
+  }, [navigate]);
 
-// Upload endpoint
-app.post('/api/upload-profile-picture', upload.single('profilePicture'), (req, res) => {
-  if (!req.file) {
-    return res.status(400).json({ error: 'No file uploaded' });
-  }
-  const imageUrl = `${req.protocol}://${req.get('host')}/uploads/${req.file.filename}`;
-  res.json({ imageUrl });
-});
+  if (loading) return <p>Loading...</p>;
 
-// Start server
-app.listen(PORT, () => {
-  console.log(`Backend server running at http://localhost:${PORT}`);
-});
+  const ProtectedRoute = ({ children }) => (user ? children : <Navigate to="/login" />);
+
+  const showNavbar = !location.pathname.startsWith("/user");
+
+  return (
+    <CartProvider>
+      <UserProvider>
+        {showNavbar && <Navbar searchTerm={searchTerm} onSearch={setSearchTerm} />}
+        <Routes>
+          {/* Public Routes */}
+          <Route path="/" element={<Home searchTerm={searchTerm} />} />
+          <Route path="/login" element={user ? <Navigate to="/user" /> : <Login />} />
+          <Route path="/signup" element={<SignUp />} />
+          <Route path="/verifyemail" element={<VerifyEmail />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
+          <Route path="/product/:id" element={<ProductDetails />} />
+
+          {/* Checkout Routes */}
+          <Route path="/checkout" element={<Checkout />} />
+          <Route path="/checkout/:productId" element={<Checkout />} />
+
+          {/* Thank You page */}
+          <Route path="/thank-you/:productId" element={<ThankYou />} />
+
+          {/* Cart */}
+          <Route path="/cart" element={<Cart />} />
+
+          {/* Protected User Routes */}
+          <Route
+            path="/user"
+            element={
+              <ProtectedRoute>
+                <UserDashboard user={user} />
+              </ProtectedRoute>
+            }
+          >
+            <Route index element={<MyAccount user={user} />} />
+            <Route path="products" element={<Products user={user} />} />
+            <Route path="upload-product" element={<UploadProduct user={user} />} />
+            <Route path="edit-product/:id" element={<EditProduct user={user} />} />
+            <Route path="mystats" element={<MyStats user={user} />} />
+          </Route>
+
+          {/* Fallback for unknown routes */}
+          <Route path="*" element={<Navigate to="/" />} />
+        </Routes>
+      </UserProvider>
+    </CartProvider>
+  );
+}
+
+export default function App() {
+  return (
+    <Router>
+      <AppWrapper />
+    </Router>
+  );
+}
+
+// Render the app
+const container = document.getElementById("root");
+const root = createRoot(container);
+root.render(<App />);

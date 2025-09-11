@@ -9,8 +9,12 @@ export default defineConfig({
     viteStaticCopy({
       targets: [
         {
-          src: '_redirects',  // your redirects file in project root (frontend folder)
-          dest: '.'           // copy into dist/
+          src: '_redirects',   // file in frontend root
+          dest: '.'            // copy into dist/
+        },
+        {
+          src: 'public/static.json', // file inside public/
+          dest: '.'                  // copy into dist/
         }
       ]
     })

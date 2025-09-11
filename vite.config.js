@@ -1,10 +1,14 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
+import { defineConfig } from 'vite';
+import react from '@vitejs/plugin-react';
+import { viteStaticCopy } from 'vite-plugin-static-copy';
 
 export default defineConfig({
-  plugins: [react()],
-  build: {
-    outDir: 'dist',
-  },
-  publicDir: 'public', // ensures static.json is copied to dist/
-})
+  plugins: [
+    react(),
+    viteStaticCopy({
+      targets: [
+        { src: 'public/static.json', dest: '.' }
+      ]
+    })
+  ]
+});

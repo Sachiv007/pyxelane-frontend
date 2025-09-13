@@ -10,23 +10,25 @@ export default function Login() {
   const navigate = useNavigate();
 
   const handleForgotPassword = async () => {
-  if (!email) {
-    alert("Please enter your email address first.");
-    return;
-  }
-  setLoading(true);
-  const { error } = await supabase.auth.resetPasswordForEmail(email, {
-    redirectTo: `${process.env.REACT_APP_FRONTEND_URL}/reset-password`
-  });
-  setLoading(false);
+    if (!email) {
+      alert("Please enter your email address first.");
+      return;
+    }
+    setLoading(true);
 
-  if (error) {
-    alert("Failed to send reset email: " + error.message);
-  } else {
-    alert("Password reset email sent. Check your inbox.");
-  }
-};
+    // Use your live frontend URL directly to avoid undefined
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: 'https://www.pyxelane.com/reset-password'
+    });
 
+    setLoading(false);
+
+    if (error) {
+      alert("Failed to send reset email: " + error.message);
+    } else {
+      alert("Password reset email sent. Check your inbox.");
+    }
+  };
 
   const handleLogin = async (e) => {
     e.preventDefault();

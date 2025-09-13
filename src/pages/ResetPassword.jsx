@@ -10,23 +10,22 @@ export default function ResetPassword() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Try hash first, fallback to query params
+    // Check for token in hash or query params
     const hashParams = new URLSearchParams(window.location.hash.substring(1));
     let token = hashParams.get("token");
-    const type = hashParams.get("type");
-
-    if (!token || type !== "recovery") {
-      // Fallback to query string for Render deployments
+    if (!token) {
       const queryParams = new URLSearchParams(window.location.search);
       token = queryParams.get("token");
-      if (!token || queryParams.get("type") !== "recovery") {
-        alert("Invalid or missing password reset token.");
-        navigate("/login");
-        return;
-      }
     }
 
-    setRecoveryToken(token);
+    const type = hashParams.get("type") || new URLSearchParams(window.location.search).get("type");
+
+    if (!token || type !== "recovery") {
+      alert("Invalid or missing password reset token.");
+      navigate("/login");
+    } else {
+      setRecoveryToken(token);
+    }
   }, [navigate]);
 
   const handlePasswordReset = async (e) => {
@@ -43,9 +42,7 @@ export default function ResetPassword() {
     }
 
     setLoading(true);
-
     const { error } = await supabase.auth.updateUser({ password, token: recoveryToken });
-
     setLoading(false);
 
     if (error) {
@@ -84,6 +81,7 @@ export default function ResetPassword() {
     </div>
   );
 }
+
 
 
 

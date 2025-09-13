@@ -37,37 +37,38 @@ function AppWrapper() {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
 
-  // Fetch session and listen to auth changes
   useEffect(() => {
     const fetchSession = async () => {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-      setUser(session?.user ?? null);
+      const { data: { session } } = await supabase.auth.getSession();
+      const hashParams = new URLSearchParams(window.location.hash.substring(1));
+      const type = hashParams.get("type");
+      // Only set user if not password recovery
+      if (type !== "recovery") setUser(session?.user ?? null);
       setLoading(false);
     };
 
     fetchSession();
 
-    const { data: authListener } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        setUser(session?.user ?? null);
+    const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
+      const hashParams = new URLSearchParams(window.location.hash.substring(1));
+      const type = hashParams.get("type");
 
-        if (event === "PASSWORD_RECOVERY") {
-          navigate("/reset-password");
-        }
+      if (event === "PASSWORD_RECOVERY") {
+        navigate("/reset-password");
+      } else if (event === "SIGNED_IN" && type !== "recovery") {
+        setUser(session?.user ?? null);
+        navigate("/user");
+      } else {
+        setUser(session?.user ?? null);
       }
-    );
+    });
 
     return () => authListener.subscription.unsubscribe();
   }, [navigate]);
 
   if (loading) return <p>Loading...</p>;
 
-  // Protected route wrapper
   const ProtectedRoute = ({ children }) => (user ? children : <Navigate to="/login" />);
-
-  // Show Navbar on non-user dashboard pages
   const showNavbar = !location.pathname.startsWith("/user");
 
   return (
@@ -75,32 +76,19 @@ function AppWrapper() {
       <UserProvider>
         {showNavbar && <Navbar searchTerm={searchTerm} onSearch={setSearchTerm} />}
         <Routes>
-          {/* Public Routes */}
           <Route path="/" element={<Home searchTerm={searchTerm} />} />
           <Route path="/login" element={user ? <Navigate to="/user" /> : <Login />} />
           <Route path="/signup" element={user ? <Navigate to="/user" /> : <SignUp />} />
           <Route path="/verifyemail" element={<VerifyEmail />} />
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/product/:id" element={<ProductDetails />} />
-
-          {/* Checkout */}
           <Route path="/checkout" element={<Checkout />} />
           <Route path="/checkout/:productId" element={<Checkout />} />
-
-          {/* Thank You */}
           <Route path="/thank-you/:productId" element={<ThankYou />} />
-
-          {/* Cart */}
           <Route path="/cart" element={<Cart />} />
-
-          {/* Protected User Routes */}
           <Route
             path="/user"
-            element={
-              <ProtectedRoute>
-                <UserDashboard user={user} />
-              </ProtectedRoute>
-            }
+            element={<ProtectedRoute><UserDashboard user={user} /></ProtectedRoute>}
           >
             <Route index element={<MyAccount user={user} />} />
             <Route path="products" element={<Products user={user} />} />
@@ -108,8 +96,6 @@ function AppWrapper() {
             <Route path="edit-product/:id" element={<EditProduct user={user} />} />
             <Route path="mystats" element={<MyStats user={user} />} />
           </Route>
-
-          {/* Fallback */}
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>
       </UserProvider>
@@ -125,7 +111,7 @@ export default function App() {
   );
 }
 
-// Render app
+// Render the app
 const container = document.getElementById("root");
 const root = createRoot(container);
 root.render(<App />);

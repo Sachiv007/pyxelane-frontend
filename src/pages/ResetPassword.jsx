@@ -9,17 +9,24 @@ export default function ResetPassword() {
   const navigate = useNavigate();
   const [recoveryToken, setRecoveryToken] = useState(null);
 
-  // On mount, grab recovery token from URL
   useEffect(() => {
+    // 1️⃣ Try reading from hash first
     const hashParams = new URLSearchParams(window.location.hash.substring(1));
-    const token = hashParams.get("access_token");
-    const type = hashParams.get("type");
+    let token = hashParams.get("token");
 
-    if (type === "recovery" && token) {
-      setRecoveryToken(token);
-    } else {
+    // 2️⃣ If no token in hash, try query parameters
+    if (!token) {
+      const queryParams = new URLSearchParams(window.location.search);
+      token = queryParams.get("token");
+    }
+
+    const type = hashParams.get("type") || new URLSearchParams(window.location.search).get("type");
+
+    if (!token || type !== "recovery") {
       alert("Invalid or missing password reset token.");
       navigate("/login");
+    } else {
+      setRecoveryToken(token);
     }
   }, [navigate]);
 
@@ -32,18 +39,14 @@ export default function ResetPassword() {
     }
 
     if (!recoveryToken) {
-      alert("No recovery token found. Please request a new password reset.");
-      navigate("/login");
+      alert("Missing token. Please request a new password reset email.");
       return;
     }
 
     setLoading(true);
 
     // Use the recovery token to update the password
-    const { error } = await supabase.auth.updateUser(
-      { password },
-      { accessToken: recoveryToken }
-    );
+    const { error } = await supabase.auth.updateUser({ password, token: recoveryToken });
 
     setLoading(false);
 
@@ -83,6 +86,7 @@ export default function ResetPassword() {
     </div>
   );
 }
+
 
 
 

@@ -12,16 +12,14 @@ export default function Login() {
 
   const handleForgotPassword = async () => {
     if (!email) {
-      alert("Please enter your email address first.");
+      alert("Please enter your email first.");
       return;
     }
     setForgotLoading(true);
 
-    // ✅ Add # hash at the end to ensure Supabase recovery token works
-    const redirectUrl =
-      import.meta.env.VITE_FRONTEND_URL
-        ? `${import.meta.env.VITE_FRONTEND_URL}/reset-password#`
-        : 'https://www.pyxelane.com/reset-password#';
+    const redirectUrl = import.meta.env.VITE_FRONTEND_URL 
+      ? `${import.meta.env.VITE_FRONTEND_URL}/reset-password#` // Important: use hash
+      : 'https://www.pyxelane.com/reset-password#';
 
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
       redirectTo: redirectUrl,
@@ -40,67 +38,36 @@ export default function Login() {
     e.preventDefault();
     setLoading(true);
 
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
 
     setLoading(false);
 
     if (error) {
-      alert('Login failed: ' + error.message);
+      alert("Login failed: " + error.message);
       return;
     }
 
     if (data.user?.email_confirmed_at) {
-      navigate('/user');
+      navigate("/user");
     } else {
-      alert('Please verify your email before logging in.');
+      alert("Please verify your email before logging in.");
     }
-  };
-
-  const goHome = () => {
-    navigate('/');
   };
 
   return (
     <div className="login-container">
       <div className="login-box">
-        <h2>Login to Your Account</h2>
-        <form className="login-form" onSubmit={handleLogin}>
-          <input
-            type="email"
-            placeholder="Email address"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            required
-          />
-          <input
-            type="password"
-            placeholder="Password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-          <button type="submit" className="button" disabled={loading}>
-            {loading ? 'Logging in...' : 'Login'}
-          </button>
+        <h2>Login</h2>
+        <form onSubmit={handleLogin}>
+          <input type="email" placeholder="Email" value={email} onChange={e => setEmail(e.target.value)} required />
+          <input type="password" placeholder="Password" value={password} onChange={e => setPassword(e.target.value)} required />
+          <button type="submit" disabled={loading}>{loading ? "Logging in..." : "Login"}</button>
         </form>
-
-        <button
-          type="button"
-          className="forgot-password-button"
-          onClick={handleForgotPassword}
-          disabled={forgotLoading || loading}
-        >
+        <button onClick={handleForgotPassword} disabled={forgotLoading || loading}>
           {forgotLoading ? "Sending..." : "Forgot Password?"}
-        </button>
-
-        <br />
-        <button onClick={goHome} className="back-button">
-          ⬅ Back to Home
         </button>
       </div>
     </div>
   );
 }
+

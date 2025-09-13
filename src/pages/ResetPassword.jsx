@@ -6,21 +6,31 @@ export default function ResetPassword() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
+  const [recoveryToken, setRecoveryToken] = useState(null);
   const navigate = useNavigate();
 
-  // Check if this page was accessed via a recovery link
   useEffect(() => {
+    // Parse token from URL hash (#)
     const hashParams = new URLSearchParams(window.location.hash.substring(1));
+    const token = hashParams.get("token");
     const type = hashParams.get("type");
 
-    if (type !== "recovery") {
+    if (!token || type !== "recovery") {
       alert("Invalid or missing password reset token.");
       navigate("/login");
+      return;
     }
+
+    setRecoveryToken(token);
   }, [navigate]);
 
   const handlePasswordReset = async (e) => {
     e.preventDefault();
+
+    if (!recoveryToken) {
+      alert("Missing token. Please request a new password reset email.");
+      return;
+    }
 
     if (password !== confirmPassword) {
       alert("Passwords do not match.");
@@ -28,16 +38,13 @@ export default function ResetPassword() {
     }
 
     setLoading(true);
-
-    // ✅ Just update the password; Supabase handles the token internally
-    const { error } = await supabase.auth.updateUser({ password });
-
+    const { error } = await supabase.auth.updateUser({ password, token: recoveryToken });
     setLoading(false);
 
     if (error) {
       alert("Failed to reset password: " + error.message);
     } else {
-      alert("Password has been reset successfully. Please log in.");
+      alert("Password reset successfully. Please log in.");
       navigate("/login");
     }
   };
@@ -45,31 +52,17 @@ export default function ResetPassword() {
   return (
     <div className="reset-container">
       <div className="reset-box">
-        <h2>Reset Your Password</h2>
+        <h2>Reset Password</h2>
         <form onSubmit={handlePasswordReset}>
-          <input
-            type="password"
-            placeholder="New password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-          <input
-            type="password"
-            placeholder="Confirm new password"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            required
-          />
-          <button type="submit" disabled={loading}>
-            {loading ? "Updating..." : "Update Password"}
-          </button>
+          <input type="password" placeholder="New password" value={password} onChange={e => setPassword(e.target.value)} required />
+          <input type="password" placeholder="Confirm new password" value={confirmPassword} onChange={e => setConfirmPassword(e.target.value)} required />
+          <button type="submit" disabled={loading}>{loading ? "Updating..." : "Update Password"}</button>
         </form>
-        <button onClick={() => navigate("/login")}>⬅ Back to Login</button>
       </div>
     </div>
   );
 }
+
 
 
 

@@ -1,18 +1,23 @@
 import React, { useEffect, useState } from "react";
+import { createRoot } from "react-dom/client";
 import {
   BrowserRouter as Router,
   Routes,
   Route,
   Navigate,
   useLocation,
-  useNavigate,
+  useNavigate
 } from "react-router-dom";
 import { supabase } from "./supabaseClient";
 
+import { CartProvider } from "./contexts/CartContext";
+import { UserProvider } from "./contexts/UserContext";
 import Navbar from "./components/Navbar";
+
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import SignUp from "./pages/SignUp";
+import VerifyEmail from "./pages/VerifyEmail";
 import ResetPassword from "./pages/ResetPassword";
 import UserDashboard from "./pages/UserDashboard";
 import MyAccount from "./pages/MyAccount";
@@ -25,9 +30,6 @@ import ThankYou from "./pages/ThankYou";
 import Cart from "./pages/Cart";
 import MyStats from "./pages/MyStats";
 
-import { CartProvider } from "./contexts/CartContext";
-import { UserProvider } from "./contexts/UserContext";
-
 function AppWrapper() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -38,26 +40,34 @@ function AppWrapper() {
   useEffect(() => {
     const fetchSession = async () => {
       const { data: { session } } = await supabase.auth.getSession();
-      setUser(session?.user ?? null);
+      const hashParams = new URLSearchParams(window.location.hash.substring(1));
+      const type = hashParams.get("type");
+      // Only set user if not password recovery
+      if (type !== "recovery") setUser(session?.user ?? null);
       setLoading(false);
     };
+
     fetchSession();
 
-    const { data: authListener } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        if (event === "PASSWORD_RECOVERY") {
-          navigate("/reset-password");
-        } else if (event === "SIGNED_IN") {
-          setUser(session?.user ?? null);
-          navigate("/user");
-        } else if (event === "SIGNED_OUT") {
-          setUser(null);
-        }
+    const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
+      const hashParams = new URLSearchParams(window.location.hash.substring(1));
+      const type = hashParams.get("type");
+
+      // Navigate only if necessary
+      if (event === "PASSWORD_RECOVERY") {
+        if (location.pathname !== "/reset-password") navigate("/reset-password");
+      } else if (event === "SIGNED_IN" && type !== "recovery") {
+        setUser(session?.user ?? null);
+        if (!location.pathname.startsWith("/user")) navigate("/user");
+      } else if (event === "SIGNED_OUT") {
+        setUser(null);
+      } else {
+        setUser(session?.user ?? null);
       }
-    );
+    });
 
     return () => authListener.subscription.unsubscribe();
-  }, [navigate]);
+  }, [navigate, location.pathname]);
 
   if (loading) return <p>Loading...</p>;
 
@@ -72,6 +82,7 @@ function AppWrapper() {
           <Route path="/" element={<Home searchTerm={searchTerm} />} />
           <Route path="/login" element={user ? <Navigate to="/user" /> : <Login />} />
           <Route path="/signup" element={user ? <Navigate to="/user" /> : <SignUp />} />
+          <Route path="/verifyemail" element={<VerifyEmail />} />
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/product/:id" element={<ProductDetails />} />
           <Route path="/checkout" element={<Checkout />} />
@@ -80,11 +91,7 @@ function AppWrapper() {
           <Route path="/cart" element={<Cart />} />
           <Route
             path="/user"
-            element={
-              <ProtectedRoute>
-                <UserDashboard user={user} />
-              </ProtectedRoute>
-            }
+            element={<ProtectedRoute><UserDashboard user={user} /></ProtectedRoute>}
           >
             <Route index element={<MyAccount user={user} />} />
             <Route path="products" element={<Products user={user} />} />
@@ -106,5 +113,10 @@ export default function App() {
     </Router>
   );
 }
+
+// Render the app
+const container = document.getElementById("root");
+const root = createRoot(container);
+root.render(<App />);
 
 

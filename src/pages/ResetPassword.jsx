@@ -1,104 +1,75 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "../supabaseClient";
 
 export default function ResetPassword() {
-  const navigate = useNavigate();
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
-  const [loading, setLoading] = useState(true);
+  const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
+  // On mount, check if we got a recovery token
   useEffect(() => {
-    const hash = window.location.hash.substring(1); // remove #
-    const params = new URLSearchParams(hash);
-    const accessToken = params.get("access_token");
-    const type = params.get("type");
+    const hashParams = new URLSearchParams(window.location.hash.substring(1));
+    const type = hashParams.get("type");
 
-    if (!accessToken || type !== "recovery") {
-      setError("Invalid or expired password reset link.");
-      setLoading(false);
-      return;
+    if (type !== "recovery") {
+      alert("Invalid or missing password reset token.");
+      navigate("/login");
     }
+  }, [navigate]);
 
-    // Set session with the recovery token
-    supabase.auth
-      .setSession({
-        access_token: accessToken,
-        refresh_token: params.get("refresh_token"),
-      })
-      .then(({ error }) => {
-        if (error) {
-          console.error("Failed to set session:", error);
-          setError("Invalid or expired password reset link.");
-        }
-        setLoading(false);
-      })
-      .catch((err) => {
-        console.error(err);
-        setError("An unexpected error occurred.");
-        setLoading(false);
-      });
-  }, []);
-
-  const handleSubmit = async (e) => {
+  const handlePasswordReset = async (e) => {
     e.preventDefault();
-    setError("");
-    setSuccess("");
 
     if (password !== confirmPassword) {
-      setError("Passwords do not match");
+      alert("Passwords do not match.");
       return;
     }
 
     setLoading(true);
-    try {
-      const { error } = await supabase.auth.updateUser({ password });
 
-      if (error) {
-        setError("Failed to reset password: " + error.message);
-      } else {
-        setSuccess("Password updated successfully! Redirecting to login...");
-        setTimeout(() => navigate("/login"), 3000);
-      }
-    } catch (err) {
-      setError("An unexpected error occurred: " + err.message);
-    } finally {
-      setLoading(false);
+    const { error } = await supabase.auth.updateUser({ password });
+
+    setLoading(false);
+
+    if (error) {
+      alert("Failed to reset password: " + error.message);
+    } else {
+      alert("Password has been reset successfully. Please log in.");
+      navigate("/login");
     }
   };
 
-  if (loading) return <p>Loading...</p>;
-
   return (
     <div className="reset-container">
-      <h2>Reset Password</h2>
-      {error && <p style={{ color: "red" }}>{error}</p>}
-      {success && <p style={{ color: "green" }}>{success}</p>}
-      {!success && !error && (
-        <form onSubmit={handleSubmit}>
+      <div className="reset-box">
+        <h2>Reset Your Password</h2>
+        <form onSubmit={handlePasswordReset}>
           <input
             type="password"
-            placeholder="New Password"
+            placeholder="New password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             required
           />
           <input
             type="password"
-            placeholder="Confirm Password"
+            placeholder="Confirm new password"
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
             required
           />
           <button type="submit" disabled={loading}>
-            {loading ? "Updating..." : "Reset Password"}
+            {loading ? "Updating..." : "Update Password"}
           </button>
         </form>
-      )}
+        <button onClick={() => navigate("/login")}>⬅ Back to Login</button>
+      </div>
     </div>
   );
 }
+
+
 
 

@@ -7,6 +7,7 @@ export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [forgotLoading, setForgotLoading] = useState(false); // separate loading for forgot password
   const navigate = useNavigate();
 
   const handleForgotPassword = async () => {
@@ -14,7 +15,7 @@ export default function Login() {
       alert("Please enter your email address first.");
       return;
     }
-    setLoading(true);
+    setForgotLoading(true);
 
     const redirectUrl =
       import.meta.env.VITE_FRONTEND_URL
@@ -25,7 +26,7 @@ export default function Login() {
       redirectTo: redirectUrl
     });
 
-    setLoading(false);
+    setForgotLoading(false);
 
     if (error) {
       alert("Failed to send reset email: " + error.message);
@@ -88,9 +89,9 @@ export default function Login() {
           type="button"
           className="forgot-password-button"
           onClick={handleForgotPassword}
-          disabled={loading}
+          disabled={forgotLoading || loading}
         >
-          {loading ? "Sending..." : "Forgot Password?"}
+          {forgotLoading ? "Sending..." : "Forgot Password?"}
         </button>
         <br />
         <button onClick={goHome} className="back-button">
@@ -100,4 +101,5 @@ export default function Login() {
     </div>
   );
 }
+
 

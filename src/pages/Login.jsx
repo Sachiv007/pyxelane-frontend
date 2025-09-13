@@ -10,26 +10,23 @@ export default function Login() {
   const navigate = useNavigate();
 
   const handleForgotPassword = async () => {
-    if (!email) {
-      alert('Please enter your email address first.');
-      return;
-    }
-    setLoading(true);
+  if (!email) {
+    alert("Please enter your email address first.");
+    return;
+  }
+  setLoading(true);
+  const { error } = await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: `${process.env.REACT_APP_FRONTEND_URL}/reset-password`
+  });
+  setLoading(false);
 
-    // Updated: include redirectTo so user goes to ResetPassword page
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: `${process.env.REACT_APP_FRONTEND_URL}/reset-password`,
-    });
+  if (error) {
+    alert("Failed to send reset email: " + error.message);
+  } else {
+    alert("Password reset email sent. Check your inbox.");
+  }
+};
 
-    setLoading(false);
-    if (error) {
-      alert('Failed to send reset email: ' + error.message);
-    } else {
-      alert(
-        'Password reset email sent. Check your inbox (and spam folder if you don’t see it).'
-      );
-    }
-  };
 
   const handleLogin = async (e) => {
     e.preventDefault();

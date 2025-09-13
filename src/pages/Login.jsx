@@ -7,7 +7,7 @@ export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
-  const [forgotLoading, setForgotLoading] = useState(false); // separate loading for forgot password
+  const [forgotLoading, setForgotLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleForgotPassword = async () => {
@@ -17,13 +17,14 @@ export default function Login() {
     }
     setForgotLoading(true);
 
+    // Supabase needs hash (#) in redirect to pass recovery tokens correctly
     const redirectUrl =
       import.meta.env.VITE_FRONTEND_URL
-        ? `${import.meta.env.VITE_FRONTEND_URL}/reset-password`
-        : 'https://www.pyxelane.com/reset-password';
+        ? `${import.meta.env.VITE_FRONTEND_URL}/reset-password#`
+        : 'https://www.pyxelane.com/reset-password#';
 
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: redirectUrl
+      redirectTo: redirectUrl,
     });
 
     setForgotLoading(false);

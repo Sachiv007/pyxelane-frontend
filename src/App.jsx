@@ -30,16 +30,31 @@ function AppWrapper() {
   const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
+    // Get current session
     supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user ?? null);
+      // Only set user if not a recovery link
+      const urlParams = new URLSearchParams(window.location.hash.substring(1));
+      const type = urlParams.get("type");
+      if (type !== "recovery") {
+        setUser(session?.user ?? null);
+      }
       setLoading(false);
     });
 
+    // Listen for auth changes
     const { data: authListener } = supabase.auth.onAuthStateChange(
       (event, session) => {
-        setUser(session?.user ?? null);
+        const urlParams = new URLSearchParams(window.location.hash.substring(1));
+        const type = urlParams.get("type");
+
         if (event === "PASSWORD_RECOVERY") {
+          // Navigate to reset-password page
           navigate("/reset-password");
+        } else if (event === "SIGNED_IN" && type !== "recovery") {
+          setUser(session?.user ?? null);
+          navigate("/user");
+        } else {
+          setUser(session?.user ?? null);
         }
       }
     );
@@ -68,11 +83,11 @@ function AppWrapper() {
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/product/:id" element={<ProductDetails />} />
 
-          {/* ✅ Checkout Routes */}
+          {/* Checkout Routes */}
           <Route path="/checkout" element={<Checkout />} />           
           <Route path="/checkout/:productId" element={<Checkout />} /> 
 
-          {/* ✅ Thank You Route */}
+          {/* Thank You Route */}
           <Route path="/thank-you/:productId" element={<ThankYou />} />
 
           <Route path="/cart" element={<Cart />} />
@@ -93,7 +108,7 @@ function AppWrapper() {
             <Route path="mystats" element={<MyStats user={user} />} />
           </Route>
 
-          {/* Catch-all route for React Router (Render deployment) */}
+          {/* Catch-all */}
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>
       </UserProvider>

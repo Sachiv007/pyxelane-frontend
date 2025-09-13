@@ -18,8 +18,8 @@ export default function Login() {
     setForgotLoading(true);
 
     const redirectUrl = import.meta.env.VITE_FRONTEND_URL 
-      ? `${import.meta.env.VITE_FRONTEND_URL}/reset-password#` // Important: use hash
-      : 'https://www.pyxelane.com/reset-password#';
+      ? `${import.meta.env.VITE_FRONTEND_URL}/reset-password` // Important: use hash
+      : 'https://www.pyxelane.com/reset-password';
 
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
       redirectTo: redirectUrl,

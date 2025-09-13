@@ -1,12 +1,5 @@
 import React, { useEffect, useState } from "react";
-import {
-  BrowserRouter as Router,
-  Routes,
-  Route,
-  Navigate,
-  useLocation,
-  useNavigate,
-} from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate, useLocation, useNavigate } from "react-router-dom";
 import { supabase } from "./supabaseClient";
 
 import { CartProvider } from "./contexts/CartContext";
@@ -37,27 +30,21 @@ function AppWrapper() {
   const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
-    // ✅ Load initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUser(session?.user ?? null);
       setLoading(false);
     });
 
-    // ✅ Listen for auth state changes
     const { data: authListener } = supabase.auth.onAuthStateChange(
       (event, session) => {
         setUser(session?.user ?? null);
-
-        // ✅ Important: navigate to reset-password if recovery link used
         if (event === "PASSWORD_RECOVERY") {
           navigate("/reset-password");
         }
       }
     );
 
-    return () => {
-      authListener.subscription.unsubscribe();
-    };
+    return () => authListener.subscription.unsubscribe();
   }, [navigate]);
 
   if (loading) return <p>Loading...</p>;
@@ -65,31 +52,25 @@ function AppWrapper() {
   const ProtectedRoute = ({ children }) =>
     user ? children : <Navigate to="/login" />;
 
-  // Hide navbar on user dashboard pages
   const showNavbar = !location.pathname.startsWith("/user");
 
   return (
     <CartProvider>
       <UserProvider>
-        {showNavbar && (
-          <Navbar searchTerm={searchTerm} onSearch={setSearchTerm} />
-        )}
+        {showNavbar && <Navbar searchTerm={searchTerm} onSearch={setSearchTerm} />}
 
         <Routes>
           {/* Public Routes */}
           <Route path="/" element={<Home searchTerm={searchTerm} />} />
-          <Route
-            path="/login"
-            element={user ? <Navigate to="/user" /> : <Login />}
-          />
+          <Route path="/login" element={user ? <Navigate to="/user" /> : <Login />} />
           <Route path="/signup" element={<SignUp />} />
           <Route path="/verifyemail" element={<VerifyEmail />} />
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/product/:id" element={<ProductDetails />} />
 
           {/* ✅ Checkout Routes */}
-          <Route path="/checkout" element={<Checkout />} />
-          <Route path="/checkout/:productId" element={<Checkout />} />
+          <Route path="/checkout" element={<Checkout />} />           
+          <Route path="/checkout/:productId" element={<Checkout />} /> 
 
           {/* ✅ Thank You Route */}
           <Route path="/thank-you/:productId" element={<ThankYou />} />
@@ -107,14 +88,8 @@ function AppWrapper() {
           >
             <Route index element={<MyAccount user={user} />} />
             <Route path="products" element={<Products user={user} />} />
-            <Route
-              path="upload-product"
-              element={<UploadProduct user={user} />}
-            />
-            <Route
-              path="edit-product/:id"
-              element={<EditProduct user={user} />}
-            />
+            <Route path="upload-product" element={<UploadProduct user={user} />} />
+            <Route path="edit-product/:id" element={<EditProduct user={user} />} />
             <Route path="mystats" element={<MyStats user={user} />} />
           </Route>
 

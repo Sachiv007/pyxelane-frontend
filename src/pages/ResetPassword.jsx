@@ -10,12 +10,18 @@ export default function ResetPassword() {
   const [success, setSuccess] = useState("");
 
   useEffect(() => {
-    // Supabase automatically sets the session from the reset link
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (!session) {
+    // Supabase sends an access token in the URL after reset link click
+    const urlParams = new URLSearchParams(window.location.search);
+    const accessToken = urlParams.get("access_token");
+
+    if (accessToken) {
+      supabase.auth.setSession({ access_token: accessToken }).catch((err) => {
+        console.error("Failed to set session:", err);
         setError("Invalid or expired password reset link.");
-      }
-    });
+      });
+    } else {
+      setError("Invalid or expired password reset link.");
+    }
   }, []);
 
   const handleSubmit = async (e) => {
@@ -47,7 +53,7 @@ export default function ResetPassword() {
       <h2>Reset Password</h2>
       {error && <p style={{ color: "red" }}>{error}</p>}
       {success && <p style={{ color: "green" }}>{success}</p>}
-      {!success && (
+      {!success && !error && (
         <form onSubmit={handleSubmit}>
           <input
             type="password"

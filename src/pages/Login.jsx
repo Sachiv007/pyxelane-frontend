@@ -15,12 +15,19 @@ export default function Login() {
       return;
     }
     setLoading(true);
-    const { error } = await supabase.auth.resetPasswordForEmail(email);
+
+    // Updated: include redirectTo so user goes to ResetPassword page
+    const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      redirectTo: `${process.env.REACT_APP_FRONTEND_URL}/reset-password`,
+    });
+
     setLoading(false);
     if (error) {
       alert('Failed to send reset email: ' + error.message);
     } else {
-      alert('Password reset email sent. Check your inbox.');
+      alert(
+        'Password reset email sent. Check your inbox (and spam folder if you don’t see it).'
+      );
     }
   };
 

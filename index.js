@@ -37,16 +37,22 @@ function AppWrapper() {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
 
+  // Fetch session and listen to auth changes
   useEffect(() => {
-    // Fetch session on load
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    const fetchSession = async () => {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
       setUser(session?.user ?? null);
       setLoading(false);
-    });
+    };
+
+    fetchSession();
 
     const { data: authListener } = supabase.auth.onAuthStateChange(
       (event, session) => {
         setUser(session?.user ?? null);
+
         if (event === "PASSWORD_RECOVERY") {
           navigate("/reset-password");
         }
@@ -58,8 +64,10 @@ function AppWrapper() {
 
   if (loading) return <p>Loading...</p>;
 
+  // Protected route wrapper
   const ProtectedRoute = ({ children }) => (user ? children : <Navigate to="/login" />);
 
+  // Show Navbar on non-user dashboard pages
   const showNavbar = !location.pathname.startsWith("/user");
 
   return (
@@ -70,16 +78,16 @@ function AppWrapper() {
           {/* Public Routes */}
           <Route path="/" element={<Home searchTerm={searchTerm} />} />
           <Route path="/login" element={user ? <Navigate to="/user" /> : <Login />} />
-          <Route path="/signup" element={<SignUp />} />
+          <Route path="/signup" element={user ? <Navigate to="/user" /> : <SignUp />} />
           <Route path="/verifyemail" element={<VerifyEmail />} />
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/product/:id" element={<ProductDetails />} />
 
-          {/* Checkout Routes */}
+          {/* Checkout */}
           <Route path="/checkout" element={<Checkout />} />
           <Route path="/checkout/:productId" element={<Checkout />} />
 
-          {/* Thank You page */}
+          {/* Thank You */}
           <Route path="/thank-you/:productId" element={<ThankYou />} />
 
           {/* Cart */}
@@ -101,7 +109,7 @@ function AppWrapper() {
             <Route path="mystats" element={<MyStats user={user} />} />
           </Route>
 
-          {/* Fallback for unknown routes */}
+          {/* Fallback */}
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>
       </UserProvider>
@@ -117,7 +125,7 @@ export default function App() {
   );
 }
 
-// Render the app
+// Render app
 const container = document.getElementById("root");
 const root = createRoot(container);
 root.render(<App />);

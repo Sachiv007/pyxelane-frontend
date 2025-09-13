@@ -9,21 +9,37 @@ export default function ResetPassword() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(true);
-  const [sessionToken, setSessionToken] = useState(null); // store the access token
 
   useEffect(() => {
-    const urlParams = new URLSearchParams(window.location.search);
-    const accessToken = urlParams.get("access_token");
+    const hash = window.location.hash.substring(1); // remove #
+    const params = new URLSearchParams(hash);
+    const accessToken = params.get("access_token");
+    const type = params.get("type");
 
-    if (!accessToken) {
+    if (!accessToken || type !== "recovery") {
       setError("Invalid or expired password reset link.");
       setLoading(false);
       return;
     }
 
-    // Store the token for password update but do NOT set session automatically
-    setSessionToken(accessToken);
-    setLoading(false);
+    // Set session with the recovery token
+    supabase.auth
+      .setSession({
+        access_token: accessToken,
+        refresh_token: params.get("refresh_token"),
+      })
+      .then(({ error }) => {
+        if (error) {
+          console.error("Failed to set session:", error);
+          setError("Invalid or expired password reset link.");
+        }
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error(err);
+        setError("An unexpected error occurred.");
+        setLoading(false);
+      });
   }, []);
 
   const handleSubmit = async (e) => {
@@ -38,11 +54,7 @@ export default function ResetPassword() {
 
     setLoading(true);
     try {
-      // Use the token to update the password without logging in automatically
-      const { error } = await supabase.auth.updateUser(
-        { password },
-        { accessToken: sessionToken }
-      );
+      const { error } = await supabase.auth.updateUser({ password });
 
       if (error) {
         setError("Failed to reset password: " + error.message);
@@ -88,4 +100,5 @@ export default function ResetPassword() {
     </div>
   );
 }
+
 

@@ -30,25 +30,22 @@ function AppWrapper() {
   const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
-    // Get current session
+    // Get session, but ignore recovery links
     supabase.auth.getSession().then(({ data: { session } }) => {
-      // Only set user if not a recovery link
-      const urlParams = new URLSearchParams(window.location.hash.substring(1));
-      const type = urlParams.get("type");
+      const hashParams = new URLSearchParams(window.location.hash.substring(1));
+      const type = hashParams.get("type");
       if (type !== "recovery") {
         setUser(session?.user ?? null);
       }
       setLoading(false);
     });
 
-    // Listen for auth changes
     const { data: authListener } = supabase.auth.onAuthStateChange(
       (event, session) => {
-        const urlParams = new URLSearchParams(window.location.hash.substring(1));
-        const type = urlParams.get("type");
+        const hashParams = new URLSearchParams(window.location.hash.substring(1));
+        const type = hashParams.get("type");
 
         if (event === "PASSWORD_RECOVERY") {
-          // Navigate to reset-password page
           navigate("/reset-password");
         } else if (event === "SIGNED_IN" && type !== "recovery") {
           setUser(session?.user ?? null);
@@ -64,8 +61,7 @@ function AppWrapper() {
 
   if (loading) return <p>Loading...</p>;
 
-  const ProtectedRoute = ({ children }) =>
-    user ? children : <Navigate to="/login" />;
+  const ProtectedRoute = ({ children }) => user ? children : <Navigate to="/login" />;
 
   const showNavbar = !location.pathname.startsWith("/user");
 
@@ -83,24 +79,16 @@ function AppWrapper() {
           <Route path="/reset-password" element={<ResetPassword />} />
           <Route path="/product/:id" element={<ProductDetails />} />
 
-          {/* Checkout Routes */}
+          {/* Checkout */}
           <Route path="/checkout" element={<Checkout />} />           
           <Route path="/checkout/:productId" element={<Checkout />} /> 
 
-          {/* Thank You Route */}
+          {/* Thank You */}
           <Route path="/thank-you/:productId" element={<ThankYou />} />
-
           <Route path="/cart" element={<Cart />} />
 
-          {/* Protected User Routes */}
-          <Route
-            path="/user"
-            element={
-              <ProtectedRoute>
-                <UserDashboard user={user} />
-              </ProtectedRoute>
-            }
-          >
+          {/* Protected User */}
+          <Route path="/user" element={<ProtectedRoute><UserDashboard user={user} /></ProtectedRoute>}>
             <Route index element={<MyAccount user={user} />} />
             <Route path="products" element={<Products user={user} />} />
             <Route path="upload-product" element={<UploadProduct user={user} />} />

@@ -6,28 +6,27 @@ export default function ResetPassword() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
   const [recoveryToken, setRecoveryToken] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
-    // 1️⃣ Try reading from hash first
+    // Try hash first, fallback to query params
     const hashParams = new URLSearchParams(window.location.hash.substring(1));
     let token = hashParams.get("token");
-
-    // 2️⃣ If no token in hash, try query parameters
-    if (!token) {
-      const queryParams = new URLSearchParams(window.location.search);
-      token = queryParams.get("token");
-    }
-
-    const type = hashParams.get("type") || new URLSearchParams(window.location.search).get("type");
+    const type = hashParams.get("type");
 
     if (!token || type !== "recovery") {
-      alert("Invalid or missing password reset token.");
-      navigate("/login");
-    } else {
-      setRecoveryToken(token);
+      // Fallback to query string for Render deployments
+      const queryParams = new URLSearchParams(window.location.search);
+      token = queryParams.get("token");
+      if (!token || queryParams.get("type") !== "recovery") {
+        alert("Invalid or missing password reset token.");
+        navigate("/login");
+        return;
+      }
     }
+
+    setRecoveryToken(token);
   }, [navigate]);
 
   const handlePasswordReset = async (e) => {
@@ -45,7 +44,6 @@ export default function ResetPassword() {
 
     setLoading(true);
 
-    // Use the recovery token to update the password
     const { error } = await supabase.auth.updateUser({ password, token: recoveryToken });
 
     setLoading(false);

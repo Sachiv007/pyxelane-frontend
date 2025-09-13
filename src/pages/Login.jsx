@@ -17,7 +17,7 @@ export default function Login() {
     }
     setForgotLoading(true);
 
-    // Supabase requires a hash (#) in the redirect for recovery tokens to work
+    // Include the hash (#) in redirect to ensure recovery token works
     const redirectUrl =
       import.meta.env.VITE_FRONTEND_URL
         ? `${import.meta.env.VITE_FRONTEND_URL}/reset-password#`

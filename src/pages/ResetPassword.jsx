@@ -9,6 +9,10 @@ export default function ResetPassword() {
   const [recoveryToken, setRecoveryToken] = useState(null);
   const navigate = useNavigate();
 
+  console.log("Token from hash:", token);
+console.log("Full URL:", window.location.href);
+
+
   useEffect(() => {
     // Check for token in hash or query params
     const hashParams = new URLSearchParams(window.location.hash.substring(1));

@@ -6,29 +6,16 @@ export default function ResetPassword() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const [recoveryToken, setRecoveryToken] = useState(null);
   const navigate = useNavigate();
 
-  console.log("Token from hash:", token);
-console.log("Full URL:", window.location.href);
-
-
+  // Check if this page was accessed via a recovery link
   useEffect(() => {
-    // Check for token in hash or query params
     const hashParams = new URLSearchParams(window.location.hash.substring(1));
-    let token = hashParams.get("token");
-    if (!token) {
-      const queryParams = new URLSearchParams(window.location.search);
-      token = queryParams.get("token");
-    }
+    const type = hashParams.get("type");
 
-    const type = hashParams.get("type") || new URLSearchParams(window.location.search).get("type");
-
-    if (!token || type !== "recovery") {
+    if (type !== "recovery") {
       alert("Invalid or missing password reset token.");
       navigate("/login");
-    } else {
-      setRecoveryToken(token);
     }
   }, [navigate]);
 
@@ -40,13 +27,11 @@ console.log("Full URL:", window.location.href);
       return;
     }
 
-    if (!recoveryToken) {
-      alert("Missing token. Please request a new password reset email.");
-      return;
-    }
-
     setLoading(true);
-    const { error } = await supabase.auth.updateUser({ password, token: recoveryToken });
+
+    // ✅ Just update the password; Supabase handles the token internally
+    const { error } = await supabase.auth.updateUser({ password });
+
     setLoading(false);
 
     if (error) {
@@ -85,7 +70,6 @@ console.log("Full URL:", window.location.href);
     </div>
   );
 }
-
 
 
 

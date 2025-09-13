@@ -17,10 +17,11 @@ export default function Login() {
     }
     setForgotLoading(true);
 
+    // ✅ Add # hash at the end to ensure Supabase recovery token works
     const redirectUrl =
       import.meta.env.VITE_FRONTEND_URL
-        ? `${import.meta.env.VITE_FRONTEND_URL}/reset-password`
-        : 'https://www.pyxelane.com/reset-password';
+        ? `${import.meta.env.VITE_FRONTEND_URL}/reset-password#`
+        : 'https://www.pyxelane.com/reset-password#';
 
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
       redirectTo: redirectUrl,
@@ -39,7 +40,10 @@ export default function Login() {
     e.preventDefault();
     setLoading(true);
 
-    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
 
     setLoading(false);
 
@@ -53,6 +57,10 @@ export default function Login() {
     } else {
       alert('Please verify your email before logging in.');
     }
+  };
+
+  const goHome = () => {
+    navigate('/');
   };
 
   return (
@@ -87,8 +95,9 @@ export default function Login() {
         >
           {forgotLoading ? "Sending..." : "Forgot Password?"}
         </button>
+
         <br />
-        <button onClick={() => navigate('/')} className="back-button">
+        <button onClick={goHome} className="back-button">
           ⬅ Back to Home
         </button>
       </div>

@@ -6,7 +6,7 @@ import { supabase } from '../supabaseClient';
 export default function Login() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [loading, setLoading] = useState(false); // optional for UX
+  const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
   const handleForgotPassword = async () => {
@@ -16,9 +16,13 @@ export default function Login() {
     }
     setLoading(true);
 
-    // Use your live frontend URL directly to avoid undefined
+    const redirectUrl =
+      import.meta.env.VITE_FRONTEND_URL
+        ? `${import.meta.env.VITE_FRONTEND_URL}/reset-password`
+        : 'https://www.pyxelane.com/reset-password';
+
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: 'https://www.pyxelane.com/reset-password'
+      redirectTo: redirectUrl
     });
 
     setLoading(false);
@@ -86,7 +90,7 @@ export default function Login() {
           onClick={handleForgotPassword}
           disabled={loading}
         >
-          Forgot Password?
+          {loading ? "Sending..." : "Forgot Password?"}
         </button>
         <br />
         <button onClick={goHome} className="back-button">
@@ -96,3 +100,4 @@ export default function Login() {
     </div>
   );
 }
+

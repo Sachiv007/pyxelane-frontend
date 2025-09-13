@@ -21,7 +21,8 @@ export default function ResetPassword() {
     }
 
     // Set the session with the token
-    supabase.auth.setSession({ access_token: accessToken })
+    supabase.auth
+      .setSession({ access_token: accessToken })
       .then(({ error }) => {
         if (error) {
           console.error("Failed to set session:", error);
@@ -46,8 +47,9 @@ export default function ResetPassword() {
       return;
     }
 
+    setLoading(true);
     try {
-      // Now the session is set, this will work
+      // Update the user password
       const { error } = await supabase.auth.updateUser({ password });
 
       if (error) {
@@ -58,6 +60,8 @@ export default function ResetPassword() {
       }
     } catch (err) {
       setError("An unexpected error occurred: " + err.message);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -84,7 +88,9 @@ export default function ResetPassword() {
             onChange={(e) => setConfirmPassword(e.target.value)}
             required
           />
-          <button type="submit">Reset Password</button>
+          <button type="submit" disabled={loading}>
+            {loading ? "Updating..." : "Reset Password"}
+          </button>
         </form>
       )}
     </div>

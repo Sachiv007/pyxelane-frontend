@@ -6,8 +6,18 @@ export default function ResetPassword() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
   const [errorMsg, setErrorMsg] = useState("");
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    // Check if URL contains password recovery token
+    const hashParams = new URLSearchParams(window.location.hash.substring(1));
+    const type = hashParams.get("type");
+
+    if (type !== "recovery") {
+      setErrorMsg("Invalid or missing password reset link.");
+    }
+  }, []);
 
   const handlePasswordReset = async (e) => {
     e.preventDefault();
@@ -21,7 +31,7 @@ export default function ResetPassword() {
     setLoading(true);
 
     try {
-      // Supabase automatically reads token from URL hash for SPA
+      // Supabase automatically reads the token from URL hash for SPA
       const { error } = await supabase.auth.updateUser({ password });
 
       setLoading(false);
@@ -78,7 +88,13 @@ export default function ResetPassword() {
       </form>
       <button
         onClick={() => navigate("/login")}
-        style={{ marginTop: "15px", background: "none", border: "none", color: "#6b5bfa", cursor: "pointer" }}
+        style={{
+          marginTop: "15px",
+          background: "none",
+          border: "none",
+          color: "#6b5bfa",
+          cursor: "pointer",
+        }}
       >
         ⬅ Back to Login
       </button>

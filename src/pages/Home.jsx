@@ -6,40 +6,26 @@ import "./Home.css";
 export default function Home({ searchTerm = "" }) {
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
-  const lastFetchTimeRef = useRef(0);
+  const lastFetchRef = useRef(0);
 
   const fetchProducts = async () => {
     const now = Date.now();
-    // Only fetch if last fetch > 5 seconds ago
-    if (now - lastFetchTimeRef.current < 5000) return;
+    if (now - lastFetchRef.current < 5000) return; // skip if fetched recently
 
-    setLoading(true);
     const { data, error } = await supabase
       .from("products")
       .select("*")
       .order("id", { ascending: false });
 
-    if (error) {
-      console.error("Error fetching products:", error);
-    } else {
-      const productsWithUrls = data.map((product) => {
-        const { data: publicUrlData } = supabase.storage
-          .from("products")
-          .getPublicUrl(product.file_path);
-        return {
-          ...product,
-          file_url: publicUrlData.publicUrl,
-        };
-      });
-
-      // Only update state if products actually changed
+    if (!error) {
       setProducts((prev) => {
         const prevIds = prev.map((p) => p.id).join(",");
-        const newIds = productsWithUrls.map((p) => p.id).join(",");
-        return prevIds === newIds ? prev : productsWithUrls;
+        const newIds = data.map((p) => p.id).join(",");
+        return prevIds === newIds ? prev : data;
       });
-
-      lastFetchTimeRef.current = now;
+      lastFetchRef.current = now;
+    } else {
+      console.error(error);
     }
     setLoading(false);
   };
@@ -48,22 +34,15 @@ export default function Home({ searchTerm = "" }) {
     fetchProducts(); // initial fetch
 
     const handleVisibilityChange = () => {
-      if (!document.hidden) {
-        fetchProducts();
-      }
+      if (!document.hidden) fetchProducts();
     };
-
     document.addEventListener("visibilitychange", handleVisibilityChange);
-    return () => {
-      document.removeEventListener("visibilitychange", handleVisibilityChange);
-    };
+    return () => document.removeEventListener("visibilitychange", handleVisibilityChange);
   }, []);
 
   const safeSearch = (searchTerm || "").toLowerCase();
   const filteredProducts = products.filter(
-    (p) =>
-      p.title?.toLowerCase().includes(safeSearch) ||
-      p.description?.toLowerCase().includes(safeSearch)
+    (p) => p.title?.toLowerCase().includes(safeSearch) || p.description?.toLowerCase().includes(safeSearch)
   );
 
   if (loading) return <p>Loading products...</p>;

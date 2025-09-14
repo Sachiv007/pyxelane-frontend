@@ -53,7 +53,7 @@ export default function ProductDetails() {
       <div className="product-info">
         <h2>{product.title || product.name}</h2>
         <p>{product.description}</p>
-        <p className="product-price">${(product.price / 100).toFixed(2)}</p>
+        <p className="product-price">${(product.price).toFixed(2)}</p>
 
         <div className="product-buttons">
           <button onClick={handleAddToCart} className="add-cart-btn">

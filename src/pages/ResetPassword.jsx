@@ -1,27 +1,22 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import { supabase } from "../supabaseClient";
+import { useNavigate } from "react-router-dom";
 
 export default function ResetPassword() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const [recoveryToken, setRecoveryToken] = useState(null);
+  const [session, setSession] = useState(null);
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Supabase sends token in hash (#) for SPA
-    const hashParams = new URLSearchParams(window.location.hash.substring(1));
-    const token = hashParams.get("token");
-    const type = hashParams.get("type");
-
-    if (!token || type !== "recovery") {
-      alert("Invalid or missing password reset token.");
-      navigate("/login");
-    } else {
-      setRecoveryToken(token);
-    }
-  }, [navigate]);
+    // Get current session
+    const fetchSession = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      setSession(session);
+    };
+    fetchSession();
+  }, []);
 
   const handlePasswordReset = async (e) => {
     e.preventDefault();
@@ -31,62 +26,54 @@ export default function ResetPassword() {
       return;
     }
 
-    if (!recoveryToken) {
-      alert("Missing token. Please request a new password reset email.");
-      return;
-    }
-
     setLoading(true);
 
-    const { error } = await supabase.auth.updateUser({
-      password,
-      token: recoveryToken,
-    });
+    // Update password using current session
+    const { error } = await supabase.auth.updateUser({ password });
 
     setLoading(false);
 
     if (error) {
       alert("Failed to reset password: " + error.message);
     } else {
-      alert("Password has been reset successfully. Please log in.");
+      alert("Password updated successfully! Please log in.");
       navigate("/login");
     }
   };
 
-  return (
-    <div className="reset-container">
-      <div className="reset-box">
-        <h2>Reset Your Password</h2>
-        <form onSubmit={handlePasswordReset}>
-          <input
-            type="password"
-            placeholder="New password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-          />
-          <input
-            type="password"
-            placeholder="Confirm new password"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            required
-          />
-          <button type="submit" disabled={loading}>
-            {loading ? "Updating..." : "Update Password"}
-          </button>
-        </form>
-        <button onClick={() => navigate("/login")}>⬅ Back to Login</button>
+  if (!session) {
+    return (
+      <div style={{ padding: "2rem" }}>
+        <h2>Reset Password</h2>
+        <p>Please use the password reset link sent to your email.</p>
       </div>
+    );
+  }
+
+  return (
+    <div style={{ maxWidth: "400px", margin: "2rem auto" }}>
+      <h2>Reset Your Password</h2>
+      <form onSubmit={handlePasswordReset}>
+        <input
+          type="password"
+          placeholder="New password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+          style={{ width: "100%", margin: "0.5rem 0", padding: "0.5rem" }}
+        />
+        <input
+          type="password"
+          placeholder="Confirm new password"
+          value={confirmPassword}
+          onChange={(e) => setConfirmPassword(e.target.value)}
+          required
+          style={{ width: "100%", margin: "0.5rem 0", padding: "0.5rem" }}
+        />
+        <button type="submit" disabled={loading} style={{ padding: "0.5rem 1rem" }}>
+          {loading ? "Updating..." : "Update Password"}
+        </button>
+      </form>
     </div>
   );
 }
-
-
-
-
-
-
-
-
-

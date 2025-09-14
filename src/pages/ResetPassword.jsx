@@ -1,59 +1,67 @@
-import React, { useEffect, useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "../supabaseClient";
 
 export default function ResetPassword() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
-  const [token, setToken] = useState(null); // store token manually
   const navigate = useNavigate();
 
-  useEffect(() => {
-    // Grab the token and type from URL hash
-    const hashParams = new URLSearchParams(window.location.hash.substring(1));
-    const urlToken = hashParams.get("token");
-    const type = hashParams.get("type");
+  const [recoveryToken, setRecoveryToken] = useState(null);
 
-    if (!urlToken || type !== "recovery") {
+  useEffect(() => {
+    // Read token either from hash (#) or query parameters (?)
+    const hashParams = new URLSearchParams(window.location.hash.substring(1));
+    const queryParams = new URLSearchParams(window.location.search);
+
+    const token = hashParams.get("access_token") || queryParams.get("token");
+    const type = hashParams.get("type") || queryParams.get("type");
+
+    if (!token || type !== "recovery") {
       setErrorMsg("Invalid or missing password reset link.");
     } else {
-      setToken(urlToken);
+      setRecoveryToken(token);
     }
   }, []);
 
-  const handleReset = async (e) => {
+  const handlePasswordReset = async (e) => {
     e.preventDefault();
     setErrorMsg("");
-
-    if (!token) {
-      setErrorMsg("Missing password reset token.");
-      return;
-    }
 
     if (password !== confirmPassword) {
       setErrorMsg("Passwords do not match.");
       return;
     }
 
+    if (!recoveryToken) {
+      setErrorMsg("Missing token. Please use the link from your email again.");
+      return;
+    }
+
+    setLoading(true);
+
     const { error } = await supabase.auth.updateUser({
       password,
-      token, // pass the token explicitly
+      token: recoveryToken,
     });
+
+    setLoading(false);
 
     if (error) {
       setErrorMsg(error.message);
     } else {
-      alert("Password reset successfully!");
+      alert("Password reset successfully! Please log in.");
       navigate("/login");
     }
   };
 
   return (
     <div style={{ maxWidth: "400px", margin: "50px auto", textAlign: "center" }}>
-      <h2>Reset Password</h2>
+      <h2>Reset Your Password</h2>
       {errorMsg && <p style={{ color: "red" }}>{errorMsg}</p>}
-      <form onSubmit={handleReset}>
+      <form onSubmit={handlePasswordReset}>
         <input
           type="password"
           placeholder="New password"
@@ -64,7 +72,7 @@ export default function ResetPassword() {
         />
         <input
           type="password"
-          placeholder="Confirm password"
+          placeholder="Confirm new password"
           value={confirmPassword}
           onChange={(e) => setConfirmPassword(e.target.value)}
           required
@@ -72,6 +80,7 @@ export default function ResetPassword() {
         />
         <button
           type="submit"
+          disabled={loading}
           style={{
             width: "100%",
             padding: "12px",
@@ -80,12 +89,24 @@ export default function ResetPassword() {
             fontWeight: "bold",
             border: "none",
             borderRadius: "6px",
-            cursor: "pointer",
+            cursor: loading ? "not-allowed" : "pointer",
           }}
         >
-          Reset Password
+          {loading ? "Updating..." : "Reset Password"}
         </button>
       </form>
+      <button
+        onClick={() => navigate("/login")}
+        style={{
+          marginTop: "15px",
+          background: "none",
+          border: "none",
+          color: "#6b5bfa",
+          cursor: "pointer",
+        }}
+      >
+        ⬅ Back to Login
+      </button>
     </div>
   );
 }

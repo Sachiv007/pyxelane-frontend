@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { supabase } from "../supabaseClient";
 
@@ -9,21 +9,36 @@ export default function ResetPassword() {
   const [errorMsg, setErrorMsg] = useState("");
   const navigate = useNavigate();
 
-  const [recoveryToken, setRecoveryToken] = useState(null);
-
+  // Handle tokens from both hash and query string
   useEffect(() => {
-    // Read token either from hash (#) or query parameters (?)
-    const hashParams = new URLSearchParams(window.location.hash.substring(1));
-    const queryParams = new URLSearchParams(window.location.search);
+    const handleRecoveryToken = async () => {
+      const hash = window.location.hash; // for #access_token
+      const search = window.location.search; // for ?token=
 
-    const token = hashParams.get("access_token") || queryParams.get("token");
-    const type = hashParams.get("type") || queryParams.get("type");
+      if (hash) {
+        // Supabase SPA mode — automatically handled
+        return;
+      }
 
-    if (!token || type !== "recovery") {
-      setErrorMsg("Invalid or missing password reset link.");
-    } else {
-      setRecoveryToken(token);
-    }
+      if (search.includes("type=recovery") && search.includes("token=")) {
+        try {
+          const { data, error } = await supabase.auth.exchangeCodeForSession(
+            search
+          );
+          if (error) {
+            console.error("Token exchange error:", error.message);
+            setErrorMsg("Invalid or expired reset link.");
+          } else {
+            console.log("Session recovered:", data);
+          }
+        } catch (err) {
+          console.error(err);
+          setErrorMsg("Something went wrong during password reset.");
+        }
+      }
+    };
+
+    handleRecoveryToken();
   }, []);
 
   const handlePasswordReset = async (e) => {
@@ -35,25 +50,22 @@ export default function ResetPassword() {
       return;
     }
 
-    if (!recoveryToken) {
-      setErrorMsg("Missing token. Please use the link from your email again.");
-      return;
-    }
-
     setLoading(true);
 
-    const { error } = await supabase.auth.updateUser({
-      password,
-      token: recoveryToken,
-    });
+    try {
+      const { error } = await supabase.auth.updateUser({ password });
 
-    setLoading(false);
+      setLoading(false);
 
-    if (error) {
-      setErrorMsg(error.message);
-    } else {
-      alert("Password reset successfully! Please log in.");
-      navigate("/login");
+      if (error) {
+        setErrorMsg(error.message);
+      } else {
+        alert("Password reset successfully! Please log in.");
+        navigate("/login");
+      }
+    } catch (err) {
+      setLoading(false);
+      setErrorMsg(err.message);
     }
   };
 
@@ -110,6 +122,7 @@ export default function ResetPassword() {
     </div>
   );
 }
+
 
 
 

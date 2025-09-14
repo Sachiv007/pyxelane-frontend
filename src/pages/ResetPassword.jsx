@@ -6,12 +6,30 @@ export default function ResetPassword() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
+  const [recoveryToken, setRecoveryToken] = useState(null);
   const [errorMsg, setErrorMsg] = useState("");
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const hashParams = new URLSearchParams(window.location.hash.substring(1));
+    const type = hashParams.get("type");
+    const token = hashParams.get("access_token") || hashParams.get("token"); // SPA hash token
+
+    if (type === "recovery" && token) {
+      setRecoveryToken(token);
+    } else {
+      setErrorMsg("Invalid password reset link.");
+    }
+  }, []);
 
   const handlePasswordReset = async (e) => {
     e.preventDefault();
     setErrorMsg("");
+
+    if (!recoveryToken) {
+      setErrorMsg("No valid token. Please request a new password reset email.");
+      return;
+    }
 
     if (password !== confirmPassword) {
       setErrorMsg("Passwords do not match.");
@@ -20,21 +38,18 @@ export default function ResetPassword() {
 
     setLoading(true);
 
-    try {
-      // Supabase automatically reads token from URL hash for SPA
-      const { error } = await supabase.auth.updateUser({ password });
+    const { error } = await supabase.auth.updateUser({
+      password,
+      token: recoveryToken,
+    });
 
-      setLoading(false);
+    setLoading(false);
 
-      if (error) {
-        setErrorMsg(error.message);
-      } else {
-        alert("Password reset successfully! Please log in.");
-        navigate("/login");
-      }
-    } catch (err) {
-      setLoading(false);
-      setErrorMsg(err.message);
+    if (error) {
+      setErrorMsg(error.message);
+    } else {
+      alert("Password reset successfully! Please log in.");
+      navigate("/login");
     }
   };
 
@@ -85,5 +100,6 @@ export default function ResetPassword() {
     </div>
   );
 }
+
 
 

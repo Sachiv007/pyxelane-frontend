@@ -7,6 +7,7 @@ export const UserProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [avatarUrl, setAvatarUrl] = useState(null);
   const [currentUserId, setCurrentUserId] = useState(null); // Track user ID to prevent unnecessary updates
+  const [avatarTimestamp, setAvatarTimestamp] = useState(Date.now()); // Force image refresh
 
   const fetchAvatar = async (user) => {
     if (user?.user_metadata?.avatar_path) {
@@ -14,7 +15,7 @@ export const UserProvider = ({ children }) => {
         .from("avatars")
         .createSignedUrl(user.user_metadata.avatar_path, 60 * 60);
       if (!error && data?.signedUrl) {
-        setAvatarUrl(`${data.signedUrl}&t=${Date.now()}`);
+        setAvatarUrl(`${data.signedUrl}&t=${avatarTimestamp}`);
       }
     } else {
       setAvatarUrl(null);
@@ -62,10 +63,15 @@ export const UserProvider = ({ children }) => {
       listener.subscription.unsubscribe();
       document.removeEventListener("visibilitychange", handleVisibilityChange);
     };
-  }, [currentUserId]);
+  }, [currentUserId, avatarTimestamp]);
+
+  // Function to force avatar refresh after upload
+  const refreshAvatar = () => {
+    setAvatarTimestamp(Date.now());
+  };
 
   return (
-    <UserContext.Provider value={{ user, setUser, avatarUrl, setAvatarUrl }}>
+    <UserContext.Provider value={{ user, setUser, avatarUrl, setAvatarUrl, refreshAvatar }}>
       {children}
     </UserContext.Provider>
   );

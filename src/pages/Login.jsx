@@ -8,24 +8,35 @@ export default function Login() {
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
 
+  // Handle user login
   const handleLogin = async (e) => {
     e.preventDefault();
     setLoading(true);
+
     const { error } = await supabase.auth.signInWithPassword({ email, password });
     setLoading(false);
 
-    if (error) alert("Login failed: " + error.message);
-    else navigate("/user");
+    if (error) {
+      alert("Login failed: " + error.message);
+    } else {
+      navigate("/user");
+    }
   };
 
+  // Handle forgot password — uses Supabase default recovery page
   const handleForgotPassword = async () => {
     if (!email) return alert("Enter your email to reset password.");
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: "https://pyxelane-frontend.onrender.com/#/reset-password"
-    });
 
-    if (error) alert("Error sending reset email: " + error.message);
-    else alert("Password reset email sent! Check your inbox.");
+    const { error } = await supabase.auth.resetPasswordForEmail(email);
+    // ✅ Notice: no redirectTo, so Supabase hosts the reset page
+
+    if (error) {
+      alert("Error sending reset email: " + error.message);
+    } else {
+      alert(
+        "Password reset email sent! Check your inbox. Follow the link to reset your password."
+      );
+    }
   };
 
   return (
@@ -63,25 +74,10 @@ export default function Login() {
           }}
         >
           {loading ? "Logging in..." : "Login"}
-        </button>
+       </button>
       </form>
-      <button
-        onClick={handleForgotPassword}
-        style={{
-          marginTop: "15px",
-          background: "none",
-          border: "none",
-          color: "#6b5bfa",
-          cursor: "pointer",
-        }}
-      >
-        Forgot Password?
-      </button>
-    </div>
+     </div>
   );
 }
-
-
-
 
 

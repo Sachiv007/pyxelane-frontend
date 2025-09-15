@@ -1,8 +1,10 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useContext } from 'react';
 import { supabase } from '../supabaseClient';
 import Cropper from 'react-easy-crop';
+import { UserContext } from '../contexts/UserContext';
 
 export default function MyAccount() {
+  const { refreshAvatar } = useContext(UserContext); // <-- added
   const [user, setUser] = useState(null);
   const [username, setUsername] = useState("");
   const [newUsername, setNewUsername] = useState("");
@@ -117,6 +119,9 @@ export default function MyAccount() {
     setAvatarUrl(data.signedUrl);
     setPreview(null);
     setImage(null);
+
+    refreshAvatar(); // <-- triggers immediate update in Navbar and Home
+
     alert('Profile picture uploaded successfully!');
   };
 

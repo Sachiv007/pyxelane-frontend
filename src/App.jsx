@@ -13,7 +13,7 @@ import Navbar from "./components/Navbar";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import SignUp from "./pages/SignUp";
-import ResetPassword from "./pages/ResetPassword";
+// import ResetPassword from "./pages/ResetPassword"; // removed
 import UserDashboard from "./pages/UserDashboard";
 import MyAccount from "./pages/MyAccount";
 import Products from "./pages/Products";
@@ -24,11 +24,12 @@ import Checkout from "./pages/Checkout";
 import ThankYou from "./pages/ThankYou";
 import Cart from "./pages/Cart";
 import MyStats from "./pages/MyStats";
+import AboutUs from "./pages/AboutUs"; // new About Us page
 
 import { CartProvider } from "./contexts/CartContext";
 import { UserProvider } from "./contexts/UserContext";
 
-// Wrapper component to handle recovery links
+// Wrapper component
 function AppWrapper() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -52,16 +53,6 @@ function AppWrapper() {
     return () => authListener.subscription.unsubscribe();
   }, []);
 
-  // Handle Supabase recovery redirect
-  useEffect(() => {
-    const hashParams = new URLSearchParams(window.location.hash.substring(1));
-    const type = hashParams.get("type");
-
-    if (type === "recovery" && location.pathname !== "/reset-password") {
-      navigate("/reset-password", { replace: true });
-    }
-  }, [location, navigate]);
-
   if (loading) return <p>Loading...</p>;
 
   const ProtectedRoute = ({ children }) => (user ? children : <Navigate to="/login" />);
@@ -75,7 +66,7 @@ function AppWrapper() {
           <Route path="/" element={<Home />} />
           <Route path="/login" element={user ? <Navigate to="/user" /> : <Login />} />
           <Route path="/signup" element={user ? <Navigate to="/user" /> : <SignUp />} />
-          <Route path="/reset-password" element={<ResetPassword />} />
+          <Route path="/about" element={<AboutUs />} />
           <Route path="/product/:id" element={<ProductDetails />} />
           <Route path="/checkout" element={<Checkout />} />
           <Route path="/checkout/:productId" element={<Checkout />} />
@@ -104,5 +95,3 @@ export default function App() {
     </Router>
   );
 }
-
-

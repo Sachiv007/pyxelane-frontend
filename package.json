@@ -12,6 +12,7 @@
     "start": "node server.js"
   },
   "dependencies": {
+    "@sendgrid/mail": "^8.1.5",
     "@supabase/supabase-js": "^2.57.4",
     "@vitejs/plugin-react": "^5.0.2",
     "express": "^4.21.2",

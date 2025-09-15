@@ -16,6 +16,13 @@ const Navbar = ({ onSearch, searchTerm }) => {
 
   return (
     <nav className="navbar">
+      {/* Logo */}
+      <div className="navbar-logo">
+        <Link to="/">
+          <img src="/logo - 1.png" alt="Sapphire Lane" className="logo-image" />
+        </Link>
+      </div>
+
       {/* Left section */}
       <div className="navbar-left">
         <NavLink
@@ -24,7 +31,7 @@ const Navbar = ({ onSearch, searchTerm }) => {
             isActive ? "nav-button active" : "nav-button"
           }
         >
-          Home
+          Shop
         </NavLink>
 
         {user ? (
@@ -34,7 +41,7 @@ const Navbar = ({ onSearch, searchTerm }) => {
               isActive ? "nav-button active" : "nav-button"
             }
           >
-            Start Selling
+            Sell
           </NavLink>
         ) : (
           <NavLink
@@ -43,7 +50,7 @@ const Navbar = ({ onSearch, searchTerm }) => {
               isActive ? "nav-button active" : "nav-button"
             }
           >
-            Sign Up / Login
+            Sign Up/Login
           </NavLink>
         )}
 
@@ -53,14 +60,24 @@ const Navbar = ({ onSearch, searchTerm }) => {
             isActive ? "nav-button cart-link active" : "nav-button cart-link"
           }
         >
-          View Cart
+          Cart
           {cartItems?.length > 0 && (
             <span className="cart-badge">{cartItems.length}</span>
           )}
         </NavLink>
+
+        {/* About Us Link */}
+        <NavLink
+          to="/about"
+          className={({ isActive }) =>
+            isActive ? "nav-button active" : "nav-button"
+          }
+        >
+          Info
+        </NavLink>
       </div>
 
-      {/* Search bar */}
+      {/* Center search bar */}
       <div className="navbar-center">
         <input
           type="text"
@@ -72,6 +89,7 @@ const Navbar = ({ onSearch, searchTerm }) => {
       </div>
 
       {/* Right section (avatar) */}
+    {/*}
       {user && (
         <div className="navbar-right">
           <NavLink to="/user">
@@ -85,7 +103,7 @@ const Navbar = ({ onSearch, searchTerm }) => {
             />
           </NavLink>
         </div>
-      )}
+      )}*/}
     </nav>
   );
 };

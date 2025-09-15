@@ -10,7 +10,7 @@ export default function Home({ searchTerm = "" }) {
 
   const fetchProducts = async () => {
     const now = Date.now();
-    if (now - lastFetchRef.current < 5000) return; // skip if fetched recently
+    if (now - lastFetchRef.current < 5000) return;
 
     const { data, error } = await supabase
       .from("products")
@@ -24,41 +24,47 @@ export default function Home({ searchTerm = "" }) {
         return prevIds === newIds ? prev : data;
       });
       lastFetchRef.current = now;
-    } else {
-      console.error(error);
-    }
+    } else console.error(error);
+
     setLoading(false);
   };
 
   useEffect(() => {
-    fetchProducts(); // initial fetch
-
+    fetchProducts();
     const handleVisibilityChange = () => {
       if (!document.hidden) fetchProducts();
     };
     document.addEventListener("visibilitychange", handleVisibilityChange);
-    return () => document.removeEventListener("visibilitychange", handleVisibilityChange);
+    return () =>
+      document.removeEventListener(
+        "visibilitychange",
+        handleVisibilityChange
+      );
   }, []);
 
   const safeSearch = (searchTerm || "").toLowerCase();
   const filteredProducts = products.filter(
-    (p) => p.title?.toLowerCase().includes(safeSearch) || p.description?.toLowerCase().includes(safeSearch)
+    (p) =>
+      p.title?.toLowerCase().includes(safeSearch) ||
+      p.description?.toLowerCase().includes(safeSearch)
   );
 
   if (loading) return <p>Loading products...</p>;
 
   return (
     <div className="home-container">
-      <h1>Welcome to Sapphire Lane</h1>
+      <h1>Welcome to Pyxelane</h1>
       <p>Start selling your digital content easily.</p>
 
       <h2>Latest Products</h2>
-      <div className="products-grid four-columns">
+      <div className="products-grid">
         {filteredProducts.length > 0 ? (
           filteredProducts.map((product) => (
             <div key={product.id} className="product-card">
               <Link to={`/product/${product.id}`}>
-                {product.preview_url && <img src={product.preview_url} alt={product.title} />}
+                {product.preview_url && (
+                  <img src={product.preview_url} alt={product.title} />
+                )}
                 <h3>{product.title}</h3>
                 <p>${product.price}</p>
               </Link>

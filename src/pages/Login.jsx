@@ -21,16 +21,15 @@ export default function Login() {
   const handleForgotPassword = async () => {
     if (!email) return alert("Enter your email to reset password.");
     const { error } = await supabase.auth.resetPasswordForEmail(email, {
-  redirectTo: "https://pyxelane-frontend.onrender.com/#/reset-password"
-});
-
+      redirectTo: "https://pyxelane-frontend.onrender.com/#/reset-password"
+    });
 
     if (error) alert("Error sending reset email: " + error.message);
     else alert("Password reset email sent! Check your inbox.");
   };
 
   return (
-    <div>
+    <div style={{ maxWidth: "400px", margin: "50px auto", textAlign: "center" }}>
       <h2>Login</h2>
       <form onSubmit={handleLogin}>
         <input
@@ -39,6 +38,7 @@ export default function Login() {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
+          style={{ width: "100%", padding: "10px", margin: "10px 0" }}
         />
         <input
           type="password"
@@ -46,13 +46,41 @@ export default function Login() {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
+          style={{ width: "100%", padding: "10px", margin: "10px 0" }}
         />
-        <button type="submit">{loading ? "Logging in..." : "Login"}</button>
+        <button
+          type="submit"
+          disabled={loading}
+          style={{
+            width: "100%",
+            padding: "12px",
+            backgroundColor: "#6b5bfa",
+            color: "white",
+            fontWeight: "bold",
+            border: "none",
+            borderRadius: "6px",
+            cursor: loading ? "not-allowed" : "pointer",
+          }}
+        >
+          {loading ? "Logging in..." : "Login"}
+        </button>
       </form>
-      <button onClick={handleForgotPassword}>Forgot Password?</button>
+      <button
+        onClick={handleForgotPassword}
+        style={{
+          marginTop: "15px",
+          background: "none",
+          border: "none",
+          color: "#6b5bfa",
+          cursor: "pointer",
+        }}
+      >
+        Forgot Password?
+      </button>
     </div>
   );
 }
+
 
 
 

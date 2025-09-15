@@ -1,18 +1,15 @@
 import React, { useState } from 'react';
 import { supabase } from '../supabaseClient';
 import { useNavigate } from 'react-router-dom';
-import './EditProduct.css'; // ✅ Reuse the same CSS file
+import './EditProduct.css'; // Reuse the same CSS file
 
 export default function UploadProduct() {
   const [title, setTitle] = useState('');
-  const [price, setPrice] = useState('');
   const [description, setDescription] = useState('');
   const [previewFile, setPreviewFile] = useState(null);
   const [productFile, setProductFile] = useState(null);
   const [previewUrlLocal, setPreviewUrlLocal] = useState(null);
   const navigate = useNavigate();
-
-  const MIN_PRICE = 0.6;
 
   function sanitizeFileName(originalName) {
     return originalName
@@ -24,12 +21,7 @@ export default function UploadProduct() {
   async function handleSubmit(e) {
     e.preventDefault();
 
-    const numericPrice = parseFloat(price);
-
-    if (numericPrice !== 0 && numericPrice < MIN_PRICE) {
-      alert(`Minimum price for paid products is $${MIN_PRICE.toFixed(2)}`);
-      return;
-    }
+    const numericPrice = 0; // temporarily free
 
     let previewUrl = null;
     let productUrl = null;
@@ -96,11 +88,13 @@ export default function UploadProduct() {
   const handlePreviewFileChange = (e) => {
     const file = e.target.files[0];
     setPreviewFile(file);
-    if (file) {
-      setPreviewUrlLocal(URL.createObjectURL(file));
-    } else {
-      setPreviewUrlLocal(null);
-    }
+    if (file) setPreviewUrlLocal(URL.createObjectURL(file));
+    else setPreviewUrlLocal(null);
+  };
+
+  const handleProductFileChange = (e) => {
+    const file = e.target.files[0];
+    setProductFile(file);
   };
 
   return (
@@ -124,16 +118,8 @@ export default function UploadProduct() {
           rows="4"
         />
 
-        <input
-          type="number"
-          placeholder="Price (0.60 or higher, 0 for free)"
-          value={price}
-          onChange={(e) => setPrice(e.target.value)}
-          step="0.01"
-          min="0"
-          className="form-input"
-          required
-        />
+        {/* Price input temporarily removed */}
+        {/* <input type="number" placeholder="Price" value={price} onChange={(e) => setPrice(e.target.value)} /> */}
 
         <div className="form-group">
           <label>Product Preview (Image)</label>
@@ -156,7 +142,7 @@ export default function UploadProduct() {
           <input
             type="file"
             accept=".zip,.pdf,.wav,.mp3,.midi"
-            onChange={(e) => setProductFile(e.target.files[0])}
+            onChange={handleProductFileChange}
             className="form-input"
             required
           />

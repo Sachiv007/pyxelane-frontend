@@ -54,7 +54,7 @@ export default function Home({ searchTerm = "" }) {
   return (
     <div className="home-container">
       <h1>Welcome to Pyxelane</h1>
-      <p>Start selling your digital content easily.</p>
+      <p>A hub for digital creators and enthusiasts—browse, explore, and get inspired.</p>
 
       <h2>Latest Products</h2>
       <div className="products-grid">

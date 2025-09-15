@@ -20,7 +20,7 @@ import Products from "./pages/Products";
 import UploadProduct from "./pages/UploadProduct";
 import EditProduct from "./pages/EditProduct";
 import ProductDetails from "./pages/ProductDetails";
-import Checkout from "./pages/Checkout";
+// import Checkout from "./pages/Checkout"; // Stripe Checkout removed
 import ThankYou from "./pages/ThankYou";
 import Cart from "./pages/Cart";
 import MyStats from "./pages/MyStats";
@@ -68,8 +68,13 @@ function AppWrapper() {
           <Route path="/signup" element={user ? <Navigate to="/user" /> : <SignUp />} />
           <Route path="/about" element={<AboutUs />} />
           <Route path="/product/:id" element={<ProductDetails />} />
+          
+          {/* Stripe Checkout temporarily disabled */}
+          {/*
           <Route path="/checkout" element={<Checkout />} />
           <Route path="/checkout/:productId" element={<Checkout />} />
+          */}
+
           <Route path="/thank-you/:productId" element={<ThankYou />} />
           <Route path="/cart" element={<Cart />} />
 
@@ -95,3 +100,4 @@ export default function App() {
     </Router>
   );
 }
+

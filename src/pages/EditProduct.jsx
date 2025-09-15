@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { supabase } from "../supabaseClient";
-import "./EditProduct.css"; // 👈 new CSS file
+import "./EditProduct.css";
 
 export default function EditProduct() {
   const { id } = useParams();
@@ -20,8 +20,6 @@ export default function EditProduct() {
   const [loading, setLoading] = useState(false);
   const [uiError, setUiError] = useState("");
 
-  const MIN_PRICE = 0.6;
-
   useEffect(() => {
     (async () => {
       setUiError("");
@@ -39,7 +37,7 @@ export default function EditProduct() {
 
       setFormData({
         name: data.title || "",
-        price: data.price ?? "",
+        price: 0, // temporarily free
         description: data.description || "",
         preview_url: data.preview_url || "",
         file_url: data.file_url || "",
@@ -74,13 +72,7 @@ export default function EditProduct() {
     setLoading(true);
 
     try {
-      const numericPrice = parseFloat(String(formData.price));
-      if (!Number.isFinite(numericPrice)) {
-        throw new Error("Price must be a number.");
-      }
-      if (numericPrice !== 0 && numericPrice < MIN_PRICE) {
-        throw new Error(`Minimum price for paid products is $${MIN_PRICE.toFixed(2)}.`);
-      }
+      const numericPrice = 0; // temporarily free
 
       let previewUrl = formData.preview_url;
       let productUrl = formData.file_url;
@@ -125,7 +117,7 @@ export default function EditProduct() {
         .from("products")
         .update({
           title: formData.name,
-          price: parseFloat(String(formData.price)),
+          price: numericPrice,
           description: formData.description,
           preview_url: previewUrl,
           file_url: productUrl,
@@ -161,18 +153,16 @@ export default function EditProduct() {
           />
         </div>
 
-        <div>
-          <label>Price (0.60 or higher, 0 for free)</label>
+        {/* Price field temporarily removed */}
+        {/* <div>
+          <label>Price</label>
           <input
             type="number"
             name="price"
             value={formData.price}
             onChange={handleChange}
-            step="0.01"
-            min="0"
-            required
           />
-        </div>
+        </div> */}
 
         <div>
           <label>Description</label>
@@ -194,7 +184,7 @@ export default function EditProduct() {
                 className="product-card-img"
               />
               <h3>{formData.name || "Untitled"}</h3>
-              <p>${formData.price || "0.00"}</p>
+              <p>$0.00</p>
             </div>
           )}
         </div>

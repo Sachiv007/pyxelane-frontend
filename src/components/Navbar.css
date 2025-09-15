@@ -1,50 +1,67 @@
-/* Avatar */
-.profile-picture {
-  width: 50px !important;
-  height: 50px !important;
-  border-radius: 50%;
-  object-fit: cover;
-  border: 2px solid #C3CFFF; /* moonlight border */
-  vertical-align: center;
-}
-
-
+/* Navbar container */
 .navbar {
+  position: relative; /* for absolute search bar */
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 10px 20px;
   background-color: white;
   border-bottom: 1px solid #ddd;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-  position: sticky;
-  top: 0;
   z-index: 1000;
 }
 
-.navbar-left {
+/* Logo */
+.navbar-logo {
   display: flex;
   align-items: center;
-  gap: 15px; /* spacing between buttons */
+}
+.logo-image {
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid teal;
+}
+
+/* Center search bar */
+.navbar-center {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 350px;
+}
+.search-bar {
+  width: 100%;
+  padding: 6px 12px;
+  border-radius: 25px; /* more rounded like Etsy */
+  border: 1px solid #ddd;
+  font-size: 14px;
+}
+
+/* Right buttons */
+.navbar-right {
+  display: flex;
+  align-items: center;
+  gap: 10px;
 }
 
 .nav-button {
   text-decoration: none;
   color: black;
-  padding: 10px 0;        /* vertical padding */
-  width: 100px;           /* fixed width for all buttons */
-  text-align: center;     /* center the text */
-  border-radius: 6px;
+  padding: 6px 12px; /* smaller padding */
+  min-width: 60px;   /* smaller width */
+  text-align: center;
+  border-radius: 25px; /* fully rounded corners */
   border: 1px solid #ddd;
   background-color: white;
   transition: all 0.2s;
-  display: inline-block;
+  font-size: 13px; /* smaller font */
 }
 
 .nav-button:hover {
   box-shadow: 0 2px 6px rgba(0,0,0,0.15);
 }
-
 
 .cart-link {
   position: relative;
@@ -59,34 +76,4 @@
   border-radius: 50%;
   padding: 2px 6px;
   font-size: 12px;
-}
-
-.navbar-center {
-  flex: 1;
-  display: flex;
-  justify-content: center;
-}
-
-.search-bar {
-  width: 100%;
-  max-width: 300px;
-  padding: 5px 10px;
-  border-radius: 6px;
-  border: 1px solid #ddd;
-}
-
-
-/* Logo */
-.navbar-logo {
-  display: flex;
-  align-items: center;
-  margin-right: 15px;
-}
-
-.logo-image {
-  width: 50px;
-  height: 50px;
-  border-radius: 50%; /* makes it circular */
-  object-fit: cover;
-  border: 2px solid teal; /* main color border */
 }

@@ -23,13 +23,22 @@ const Navbar = ({ onSearch, searchTerm }) => {
         </Link>
       </div>
 
-      {/* Left section */}
-      <div className="navbar-left">
+      {/* Center search bar */}
+      <div className="navbar-center">
+        <input
+          type="text"
+          placeholder="Search products..."
+          className="search-bar"
+          value={searchTerm}
+          onChange={handleSearchChange}
+        />
+      </div>
+
+      {/* Right buttons */}
+      <div className="navbar-right">
         <NavLink
           to="/"
-          className={({ isActive }) =>
-            isActive ? "nav-button active" : "nav-button"
-          }
+          className={({ isActive }) => (isActive ? "nav-button active" : "nav-button")}
         >
           Shop
         </NavLink>
@@ -37,18 +46,14 @@ const Navbar = ({ onSearch, searchTerm }) => {
         {user ? (
           <NavLink
             to="/user/upload-product"
-            className={({ isActive }) =>
-              isActive ? "nav-button active" : "nav-button"
-            }
+            className={({ isActive }) => (isActive ? "nav-button active" : "nav-button")}
           >
             Sell
           </NavLink>
         ) : (
           <NavLink
             to="/login"
-            className={({ isActive }) =>
-              isActive ? "nav-button active" : "nav-button"
-            }
+            className={({ isActive }) => (isActive ? "nav-button active" : "nav-button")}
           >
             Sign Up/Login
           </NavLink>
@@ -61,49 +66,16 @@ const Navbar = ({ onSearch, searchTerm }) => {
           }
         >
           Cart
-          {cartItems?.length > 0 && (
-            <span className="cart-badge">{cartItems.length}</span>
-          )}
+          {cartItems?.length > 0 && <span className="cart-badge">{cartItems.length}</span>}
         </NavLink>
 
-        {/* About Us Link */}
         <NavLink
           to="/about"
-          className={({ isActive }) =>
-            isActive ? "nav-button active" : "nav-button"
-          }
+          className={({ isActive }) => (isActive ? "nav-button active" : "nav-button")}
         >
           Info
         </NavLink>
       </div>
-
-      {/* Center search bar */}
-      <div className="navbar-center">
-        <input
-          type="text"
-          placeholder="Search products..."
-          className="search-bar"
-          value={searchTerm}
-          onChange={handleSearchChange}
-        />
-      </div>
-
-      {/* Right section (avatar) */}
-    {/*}
-      {user && (
-        <div className="navbar-right">
-          <NavLink to="/user">
-            <img
-              src={avatarUrl || "/default-avatar.png"}
-              alt="Profile"
-              className="profile-picture"
-              onError={(e) => {
-                e.target.src = "/default-avatar.png";
-              }}
-            />
-          </NavLink>
-        </div>
-      )}*/}
     </nav>
   );
 };

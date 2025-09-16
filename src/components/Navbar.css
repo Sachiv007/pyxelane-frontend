@@ -105,12 +105,12 @@
     padding: 10px;
   }
 
-  /* Top row: logo + search bar on same line */
+  /* Top row: logo + search bar */
   .navbar-top-row {
     display: flex;
     align-items: center;
     width: 100%;
-    gap: 8px;
+    gap: 6px; /* small gap between logo and search bar */
     margin-bottom: 10px;
   }
 
@@ -119,8 +119,8 @@
   }
 
   .navbar-center {
-    flex: 1 1 auto;  /* search bar fills remaining space */
-    min-width: 0;    /* allow shrinking to fit container */
+    flex: 1 1 auto; /* search bar grows and shrinks */
+    min-width: 0;   /* allows shrinking inside flex container */
     position: relative;
     transform: none;
     margin: 0;
@@ -128,12 +128,12 @@
 
   .search-bar {
     width: 100%;
+    max-width: 100%; /* ensures it never overflows */
     box-sizing: border-box;
   }
 
   /* Buttons row below */
   .navbar-right {
-    order: 2;
     width: 100%;
     justify-content: center;
     gap: 8px;

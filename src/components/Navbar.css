@@ -92,32 +92,41 @@
 /* Tablets */
 @media (max-width: 899px) {
   .navbar-center {
-    max-width: 300px; /* slightly smaller on tablets */
+    max-width: 300px;
   }
 }
 
 /* Mobile */
 @media (max-width: 599px) {
   .navbar {
-    flex-wrap: nowrap; /* keep logo + searchbar on same line */
+    flex-direction: column; /* stack elements */
+    align-items: stretch;
+    padding: 10px;
+  }
+
+  .navbar-logo {
+    order: 1;
+    margin-bottom: 8px;
   }
 
   .navbar-center {
-    position: relative;   /* remove absolute positioning */
+    position: relative;
     transform: none;
-    flex: 1;              /* search bar fills remaining space next to logo */
+    width: 100%;       /* full width next to logo */
     max-width: none;
-    margin-left: 10px;    /* space between logo and search bar */
+    order: 2;
+    margin-bottom: 10px;
   }
 
   .search-bar {
-    width: 100%;          /* fills flex container */
+    width: 100%;        /* fills the container */
   }
 
   .navbar-right {
-    flex-wrap: wrap;       /* buttons can wrap if not enough space */
-    justify-content: flex-end;
+    order: 3;
+    width: 100%;
+    justify-content: center; /* row below search bar */
     gap: 8px;
-    margin-top: 5px;       /* small spacing if wrapped */
+    flex-wrap: nowrap;       /* keep buttons in single row */
   }
 }

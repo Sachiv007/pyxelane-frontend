@@ -1,90 +1,58 @@
-import { useParams, useLocation } from "react-router-dom";
-import { useEffect, useContext } from "react";
-import { CartContext } from "../contexts/CartContext";
-import { supabase } from "../supabaseClient";
+import { useEffect } from "react";
+import { useLocation } from "react-router-dom";
+import { useCart } from "../contexts/CartContext";
 
 export default function ThankYou() {
-  const { productId } = useParams();
-  const query = new URLSearchParams(useLocation().search);
-  const email = query.get("email");
-  const { clearCart } = useContext(CartContext);
+  const { clearCart } = useCart();
+  const location = useLocation();
 
   useEffect(() => {
-    // ✅ Clear the cart once when the page loads
     clearCart();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [clearCart]);
 
-  useEffect(() => {
-    if (productId && email) {
-      // ✅ Insert order into Supabase
-      const insertOrder = async () => {
-        console.log("🟡 Trying to insert order:", { productId, email });
+  const query = new URLSearchParams(location.search);
+  const downloadsParam = query.get("downloads");
 
-        const { data, error } = await supabase.from("orders").insert([
-          {
-            buyer_email: email,
-            product_id: productId,
-            stripe_session_id: crypto.randomUUID(), // placeholder
-          },
-        ]);
-
-        if (error) {
-          console.error("❌ Supabase insert error:", error);
-        } else {
-          console.log("✅ Supabase order inserted:", data);
-
-          // ✅ Trigger backend to send receipt email
-          try {
-            const res = await fetch("http://localhost:5000/api/send-receipt", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                buyerEmail: email,
-                productId,
-              }),
-            });
-
-            if (!res.ok) {
-              throw new Error("Failed to send receipt email");
-            }
-
-            console.log("📧 Receipt email sent successfully");
-          } catch (err) {
-            console.error("❌ Email sending failed:", err);
-          }
-        }
-      };
-
-      insertOrder();
-    } else {
-      console.warn("⚠️ Missing productId or email in URL.");
-    }
-  }, [productId, email]);
-
-  if (!productId) {
-    return (
-      <div className="max-w-md mx-auto p-6 bg-white shadow-lg rounded-lg mt-10 text-center">
-        <h2 className="text-2xl font-bold mb-4">Thank You!</h2>
-        <p>Invalid product. Please contact support if this persists.</p>
-      </div>
-    );
+  let downloads = [];
+  try {
+    downloads = downloadsParam ? JSON.parse(downloadsParam) : [];
+    console.log("Parsed downloads:", downloads);
+  } catch (err) {
+    console.error("Failed to parse download links:", err);
   }
 
   return (
     <div className="max-w-md mx-auto p-6 bg-white shadow-lg rounded-lg mt-10 text-center">
       <h2 className="text-2xl font-bold mb-4">Thank You!</h2>
-      <p className="mb-2">
-        We’ve sent your receipt and download link to{" "}
-        <strong>{email || "your email"}</strong>.
-      </p>
-      <p className="text-gray-600">
-        Please check your inbox. If you don’t see it, check your spam folder or
-        contact support.
-      </p>
+
+      {downloads.length > 0 ? (
+        <>
+          <p className="mb-4">
+            Your download link{downloads.length > 1 ? "s are" : " is"} ready:
+          </p>
+          <ul className="mb-4 flex flex-col gap-2">
+            {downloads.map((link, index) => (
+              <li key={index}>
+                <a
+                  href={link}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-4 py-2 bg-teal-500 text-white rounded hover:bg-teal-600"
+                  download
+                >
+                  Download {index + 1}
+                </a>
+              </li>
+            ))}
+          </ul>
+          <p className="text-gray-600">
+            Click the link{downloads.length > 1 ? "s" : ""} above to download your free product
+            {downloads.length > 1 ? "s" : ""}.
+          </p>
+        </>
+      ) : (
+        <p className="text-red-600">No download links available for free items.</p>
+      )}
     </div>
   );
 }
-
-
-

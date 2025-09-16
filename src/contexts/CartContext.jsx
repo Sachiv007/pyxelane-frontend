@@ -5,7 +5,6 @@ export const CartContext = createContext();
 
 // Cart provider
 export const CartProvider = ({ children }) => {
-  // Initialize cart from localStorage if it exists
   const [cartItems, setCartItems] = useState(() => {
     try {
       const savedCart = localStorage.getItem("cart");
@@ -15,12 +14,10 @@ export const CartProvider = ({ children }) => {
     }
   });
 
-  // Persist cartItems to localStorage whenever it changes
   useEffect(() => {
     localStorage.setItem("cart", JSON.stringify(cartItems));
   }, [cartItems]);
 
-  // Add product to cart, optionally with quantity
   const addToCart = (product, quantity = 1) => {
     setCartItems((prev) => {
       const existing = prev.find((item) => item.productId === product.productId);
@@ -31,16 +28,23 @@ export const CartProvider = ({ children }) => {
             : item
         );
       }
-      return [...prev, { ...product, quantity }];
+      // ✅ Ensure file_url is included
+      return [
+        ...prev,
+        {
+          ...product,
+          quantity,
+          file_url: product.file_url || product.file_path || "",
+          image_url: product.image_url || product.preview_url || "",
+        },
+      ];
     });
   };
 
-  // Remove product from cart
   const removeFromCart = (productId) => {
     setCartItems((prev) => prev.filter((item) => item.productId !== productId));
   };
 
-  // Update product quantity directly
   const updateQuantity = (productId, quantity) => {
     setCartItems((prev) =>
       prev.map((item) =>
@@ -49,7 +53,6 @@ export const CartProvider = ({ children }) => {
     );
   };
 
-  // Clear entire cart (✅ now clears localStorage too)
   const clearCart = () => {
     setCartItems([]);
     localStorage.removeItem("cart");

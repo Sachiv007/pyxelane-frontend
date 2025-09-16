@@ -1,11 +1,12 @@
 import React, { useState } from "react";
 import { useCart } from "../contexts/CartContext";
+import { useNavigate } from "react-router-dom";
 import "./Cart.css";
 
 const Cart = () => {
-  const { cartItems, addToCart, removeFromCart, clearCart, updateQuantity } = useCart();
+  const { cartItems, addToCart, removeFromCart, updateQuantity, clearCart } = useCart();
   const [loading, setLoading] = useState(false);
-  const [email, setEmail] = useState("");
+  const navigate = useNavigate();
 
   const increment = (item) => addToCart(item, 1);
   const decrement = (item) => {
@@ -18,45 +19,38 @@ const Cart = () => {
     0
   );
 
-  // ✅ Add backend URL via environment variable for Render deployment
-  const BACKEND_URL = import.meta.env.VITE_BACKEND_URL || "https://pyxelane-backend.onrender.com";
-
-  const handleCheckout = async () => {
-    if (!email) return alert("Please enter your email before checkout.");
+  const handleCheckout = () => {
     if (cartItems.length === 0) return;
 
-    const paidItems = cartItems.filter((item) => item.price >= 0.6);
+    // Separate free and paid items
     const freeItems = cartItems.filter((item) => item.price === 0);
+    const paidItems = cartItems.filter((item) => item.price > 0);
 
+    // If all items are free
     if (paidItems.length === 0 && freeItems.length > 0) {
-      alert(`🎉 You can now download ${freeItems.length} free product(s)!`);
+      const downloads = freeItems
+        .map((item) => item.file_url || item.file_path) // use file_url or file_path
+        .filter(Boolean);
+
+      if (downloads.length === 0) {
+        alert("No download links available for free items.");
+        return;
+      }
+
+      // Remove free items from cart
       freeItems.forEach((item) => removeFromCart(item.productId));
+
+      // Navigate to ThankYou page with downloads
+      navigate(
+        `/thank-you?downloads=${encodeURIComponent(JSON.stringify(downloads))}`
+      );
       return;
     }
 
+    // Paid items flow (if any)
     if (paidItems.length > 0) {
-      setLoading(true);
-      try {
-        const response = await fetch(`${BACKEND_URL}/api/create-checkout-session`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ cartItems: paidItems, email }),
-        });
-
-        const data = await response.json();
-        if (response.ok && data.url) {
-          if (freeItems.length > 0) {
-            alert(`🎉 You will also receive ${freeItems.length} free product(s)!`);
-            freeItems.forEach((item) => removeFromCart(item.productId));
-          }
-          window.location.href = data.url;
-        } else alert(data.error || "Failed to create checkout session.");
-      } catch (error) {
-        console.error("Checkout error:", error);
-        alert("Something went wrong with checkout.");
-      } finally {
-        setLoading(false);
-      }
+      // Your Stripe checkout flow would go here
+      alert("Paid items flow not implemented in this free-only version.");
     }
   };
 
@@ -68,7 +62,7 @@ const Cart = () => {
       <h2>Your Cart</h2>
       <ul>
         {cartItems.map((item) => (
-          <li key={item.productId}>
+          <li key={item.productId} className="cart-item">
             <div className="flex items-center gap-4">
               {item.image_url && (
                 <img src={item.image_url} alt={item.name} />
@@ -83,30 +77,29 @@ const Cart = () => {
               <button onClick={() => decrement(item)}>-</button>
               <span>{item.quantity}</span>
               <button onClick={() => increment(item)}>+</button>
-              <button className="remove-btn" onClick={() => removeFromCart(item.productId)}>Remove</button>
+              <button
+                className="remove-btn"
+                onClick={() => removeFromCart(item.productId)}
+              >
+                Remove
+              </button>
             </div>
           </li>
         ))}
       </ul>
 
-      <label>Email for receipt:</label>
-      <input
-        type="email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        placeholder="you@example.com"
-      />
-
       <div className="cart-footer">
         <p className="total">Total: ${totalPrice.toFixed(2)}</p>
         <div className="flex gap-2">
-          <button className="clear-btn" onClick={clearCart}>Clear Cart</button>
+          <button className="clear-btn" onClick={clearCart}>
+            Clear Cart
+          </button>
           <button
             className="checkout-btn"
             onClick={handleCheckout}
             disabled={loading}
           >
-            {loading ? "Processing..." : "Checkout"}
+            {loading ? "Processing..." : "Download Free Items"}
           </button>
         </div>
       </div>
@@ -115,4 +108,3 @@ const Cart = () => {
 };
 
 export default Cart;
-

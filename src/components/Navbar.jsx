@@ -6,7 +6,7 @@ import "../components/Navbar.css";
 
 const Navbar = ({ onSearch, searchTerm }) => {
   const { cartItems } = useContext(CartContext);
-  const { user, avatarUrl } = useContext(UserContext);
+  const { user } = useContext(UserContext);
 
   const handleSearchChange = (e) => {
     if (onSearch) {
@@ -19,7 +19,7 @@ const Navbar = ({ onSearch, searchTerm }) => {
       {/* Logo */}
       <div className="navbar-logo">
         <Link to="/">
-          <img src="/logo - 1.png" alt="Sapphire Lane" className="logo-image" />
+          <img src="/logo - 1.png" alt="Pyxelane" className="logo-image" />
         </Link>
       </div>
 
@@ -38,7 +38,9 @@ const Navbar = ({ onSearch, searchTerm }) => {
       <div className="navbar-right">
         <NavLink
           to="/"
-          className={({ isActive }) => (isActive ? "nav-button active" : "nav-button")}
+          className={({ isActive }) =>
+            isActive ? "nav-button active" : "nav-button"
+          }
         >
           Shop
         </NavLink>
@@ -46,14 +48,18 @@ const Navbar = ({ onSearch, searchTerm }) => {
         {user ? (
           <NavLink
             to="/user/upload-product"
-            className={({ isActive }) => (isActive ? "nav-button active" : "nav-button")}
+            className={({ isActive }) =>
+              isActive ? "nav-button active" : "nav-button"
+            }
           >
             Sell
           </NavLink>
         ) : (
           <NavLink
             to="/login"
-            className={({ isActive }) => (isActive ? "nav-button active" : "nav-button")}
+            className={({ isActive }) =>
+              isActive ? "nav-button active" : "nav-button"
+            }
           >
             Sign Up/Login
           </NavLink>
@@ -66,12 +72,16 @@ const Navbar = ({ onSearch, searchTerm }) => {
           }
         >
           Cart
-          {cartItems?.length > 0 && <span className="cart-badge">{cartItems.length}</span>}
+          {cartItems?.length > 0 && (
+            <span className="cart-badge">{cartItems.length}</span>
+          )}
         </NavLink>
 
         <NavLink
           to="/about"
-          className={({ isActive }) => (isActive ? "nav-button active" : "nav-button")}
+          className={({ isActive }) =>
+            isActive ? "nav-button active" : "nav-button"
+          }
         >
           Info
         </NavLink>

@@ -13,18 +13,16 @@ import Navbar from "./components/Navbar";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import SignUp from "./pages/SignUp";
-// import ResetPassword from "./pages/ResetPassword"; // removed
 import UserDashboard from "./pages/UserDashboard";
 import MyAccount from "./pages/MyAccount";
 import Products from "./pages/Products";
 import UploadProduct from "./pages/UploadProduct";
 import EditProduct from "./pages/EditProduct";
 import ProductDetails from "./pages/ProductDetails";
-// import Checkout from "./pages/Checkout"; // Stripe Checkout removed
 import ThankYou from "./pages/ThankYou";
 import Cart from "./pages/Cart";
 import MyStats from "./pages/MyStats";
-import AboutUs from "./pages/AboutUs"; // new About Us page
+import AboutUs from "./pages/AboutUs";
 
 import { CartProvider } from "./contexts/CartContext";
 import { UserProvider } from "./contexts/UserContext";
@@ -35,50 +33,58 @@ function AppWrapper() {
   const location = useLocation();
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
     const fetchSession = async () => {
-      const { data: { session } } = await supabase.auth.getSession();
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
       setUser(session?.user ?? null);
       setLoading(false);
     };
 
     fetchSession();
 
-    const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
-      if (event === "SIGNED_IN") setUser(session?.user ?? null);
-      else if (event === "SIGNED_OUT") setUser(null);
-    });
+    const { data: authListener } = supabase.auth.onAuthStateChange(
+      (event, session) => {
+        if (event === "SIGNED_IN") setUser(session?.user ?? null);
+        else if (event === "SIGNED_OUT") setUser(null);
+      }
+    );
 
     return () => authListener.subscription.unsubscribe();
   }, []);
 
   if (loading) return <p>Loading...</p>;
 
-  const ProtectedRoute = ({ children }) => (user ? children : <Navigate to="/login" />);
+  const ProtectedRoute = ({ children }) =>
+    user ? children : <Navigate to="/login" />;
+
   const showNavbar = !location.pathname.startsWith("/user");
 
   return (
     <CartProvider>
       <UserProvider>
-        {showNavbar && <Navbar />}
+        {showNavbar && (
+          <Navbar searchTerm={searchTerm} onSearch={setSearchTerm} />
+        )}
         <Routes>
-          <Route path="/" element={<Home />} />
+          <Route path="/" element={<Home searchTerm={searchTerm} />} />
           <Route path="/login" element={user ? <Navigate to="/user" /> : <Login />} />
           <Route path="/signup" element={user ? <Navigate to="/user" /> : <SignUp />} />
           <Route path="/about" element={<AboutUs />} />
           <Route path="/product/:id" element={<ProductDetails />} />
-          
-          {/* Stripe Checkout temporarily disabled */}
-          {/*
-          <Route path="/checkout" element={<Checkout />} />
-          <Route path="/checkout/:productId" element={<Checkout />} />
-          */}
-
-          <Route path="/thank-you/:productId" element={<ThankYou />} />
           <Route path="/cart" element={<Cart />} />
 
-          <Route path="/user" element={<ProtectedRoute><UserDashboard user={user} /></ProtectedRoute>}>
+          {/* Single ThankYou route for free downloads */}
+          <Route path="/thank-you" element={<ThankYou />} />
+
+          {/* Protected user dashboard */}
+          <Route
+            path="/user"
+            element={<ProtectedRoute><UserDashboard user={user} /></ProtectedRoute>}
+          >
             <Route index element={<MyAccount user={user} />} />
             <Route path="products" element={<Products user={user} />} />
             <Route path="upload-product" element={<UploadProduct user={user} />} />
@@ -86,6 +92,7 @@ function AppWrapper() {
             <Route path="mystats" element={<MyStats user={user} />} />
           </Route>
 
+          {/* Fallback */}
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>
       </UserProvider>
@@ -100,4 +107,3 @@ export default function App() {
     </Router>
   );
 }
-

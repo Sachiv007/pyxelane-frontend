@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { supabase } from "../supabaseClient";
 
 export default function Login() {
@@ -28,7 +28,6 @@ export default function Login() {
     if (!email) return alert("Enter your email to reset password.");
 
     const { error } = await supabase.auth.resetPasswordForEmail(email);
-    // ✅ Notice: no redirectTo, so Supabase hosts the reset page
 
     if (error) {
       alert("Error sending reset email: " + error.message);
@@ -74,10 +73,43 @@ export default function Login() {
           }}
         >
           {loading ? "Logging in..." : "Login"}
-       </button>
+        </button>
       </form>
-     </div>
+
+      {/* Forgot password link */}
+      {/*<p style={{ margin: "15px 0" }}>
+        <button
+          onClick={handleForgotPassword}
+          style={{
+            background: "none",
+            border: "none",
+            color: "#6b5bfa",
+            cursor: "pointer",
+            textDecoration: "underline",
+            fontSize: "0.9rem",
+          }}
+        >
+          Forgot password?
+        </button>
+      </p>*/}
+
+      {/* Sign Up button */}
+      <p style={{ marginTop: "20px" }}>
+        Don't have an account?{" "}
+        <Link
+          to="/signup"
+          style={{
+            padding: "8px 16px",
+            backgroundColor: "#6b5bfa",
+            color: "white",
+            borderRadius: "6px",
+            textDecoration: "none",
+            fontWeight: "bold",
+          }}
+        >
+          Sign Up
+        </Link>
+      </p>
+    </div>
   );
 }
-
-

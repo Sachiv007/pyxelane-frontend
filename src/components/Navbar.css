@@ -10,6 +10,27 @@
   z-index: 1000;
 }
 
+/* Desktop: keep navbar-center absolute */
+.navbar-center {
+  position: absolute;
+  left: 50%;
+  top: 50%;                 /* center vertically */
+  transform: translate(-50%, -50%);
+  width: 100%;
+  max-width: 400px;
+  z-index: 1000;
+}
+
+/* Search bar styling */
+.search-bar {
+  width: 100%;
+  padding: 8px 14px;
+  border-radius: 25px;
+  border: 1px solid black;
+  font-size: 14px;
+  box-sizing: border-box;
+}
+
 /* Logo */
 .navbar-logo {
   display: flex;
@@ -25,25 +46,6 @@
   border: 2px solid #14b0bc;
 }
 
-/* Center search bar (desktop) */
-.navbar-center {
-  position: absolute;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 100%;
-  max-width: 400px; /* desktop max width */
-  z-index: 1000;
-}
-
-.search-bar {
-  width: 100%;
-  padding: 8px 14px;
-  border-radius: 25px;
-  border: 1px solid black;
-  font-size: 14px;
-  box-sizing: border-box;
-}
-
 /* Right buttons */
 .navbar-right {
   display: flex;
@@ -52,6 +54,7 @@
   z-index: 1001;
 }
 
+/* Buttons hover effect */
 .nav-button {
   text-decoration: none;
   color: black;
@@ -99,34 +102,37 @@
 /* Mobile */
 @media (max-width: 599px) {
   .navbar {
-    flex-direction: column; /* stack elements */
+    flex-direction: column;
     align-items: stretch;
     padding: 10px;
   }
 
-  .navbar-logo {
-    order: 1;
-    margin-bottom: 8px;
+  /* Top row: logo + search bar on same line */
+  .navbar-top-row {
+    display: flex;
+    align-items: center;
+    width: 100%;
+    gap: 10px;
+    margin-bottom: 10px;
   }
 
   .navbar-center {
     position: relative;
     transform: none;
-    width: 100%;       /* full width next to logo */
+    flex: 1;          /* search bar fills remaining space */
     max-width: none;
-    order: 2;
-    margin-bottom: 10px;
+    margin: 0;
   }
 
   .search-bar {
-    width: 100%;        /* fills the container */
+    width: 100%;
   }
 
+  /* Buttons row below */
   .navbar-right {
-    order: 3;
     width: 100%;
-    justify-content: center; /* row below search bar */
+    justify-content: center;
     gap: 8px;
-    flex-wrap: nowrap;       /* keep buttons in single row */
+    flex-wrap: nowrap;
   }
 }

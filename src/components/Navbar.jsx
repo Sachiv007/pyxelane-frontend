@@ -16,25 +16,27 @@ const Navbar = ({ onSearch, searchTerm }) => {
 
   return (
     <nav className="navbar">
-      {/* Logo */}
-      <div className="navbar-logo">
-        <Link to="/">
-          <img src="/logo - 1.png" alt="Pyxelane" className="logo-image" />
-        </Link>
+
+      {/* Top row: Logo + Search */}
+      <div className="navbar-top-row">
+        <div className="navbar-logo">
+          <Link to="/">
+            <img src="/logo - 1.png" alt="Pyxelane" className="logo-image" />
+          </Link>
+        </div>
+
+        <div className="navbar-center">
+          <input
+            type="text"
+            placeholder="Search products..."
+            className="search-bar"
+            value={searchTerm}
+            onChange={handleSearchChange}
+          />
+        </div>
       </div>
 
-      {/* Center search bar */}
-      <div className="navbar-center">
-        <input
-          type="text"
-          placeholder="Search products..."
-          className="search-bar"
-          value={searchTerm}
-          onChange={handleSearchChange}
-        />
-      </div>
-
-      {/* Right buttons */}
+      {/* Bottom row: Right buttons */}
       <div className="navbar-right">
         <NavLink
           to="/"
@@ -45,8 +47,8 @@ const Navbar = ({ onSearch, searchTerm }) => {
           Shop
         </NavLink>
 
-        
-{/*
+        {/* Uncomment this if you want the cart */}
+        {/*
         <NavLink
           to="/cart"
           className={({ isActive }) =>
@@ -58,7 +60,7 @@ const Navbar = ({ onSearch, searchTerm }) => {
             <span className="cart-badge">{cartItems.length}</span>
           )}
         </NavLink>
-*/}
+        */}
 
         <NavLink
           to="/about"
@@ -68,7 +70,7 @@ const Navbar = ({ onSearch, searchTerm }) => {
         >
           Info
         </NavLink>
-        
+
         {user ? (
           <NavLink
             to="/user/upload-product"
@@ -88,8 +90,8 @@ const Navbar = ({ onSearch, searchTerm }) => {
             Sign Up/Login
           </NavLink>
         )}
-
       </div>
+
     </nav>
   );
 };

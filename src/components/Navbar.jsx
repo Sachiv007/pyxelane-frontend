@@ -45,26 +45,7 @@ const Navbar = ({ onSearch, searchTerm }) => {
           Shop
         </NavLink>
 
-        {user ? (
-          <NavLink
-            to="/user/upload-product"
-            className={({ isActive }) =>
-              isActive ? "nav-button active" : "nav-button"
-            }
-          >
-            Sell
-          </NavLink>
-        ) : (
-          <NavLink
-            to="/login"
-            className={({ isActive }) =>
-              isActive ? "nav-button active" : "nav-button"
-            }
-          >
-            Sign Up/Login
-          </NavLink>
-        )}
-
+        
 {/*
         <NavLink
           to="/cart"
@@ -87,6 +68,27 @@ const Navbar = ({ onSearch, searchTerm }) => {
         >
           Info
         </NavLink>
+        
+        {user ? (
+          <NavLink
+            to="/user/upload-product"
+            className={({ isActive }) =>
+              isActive ? "nav-button active" : "nav-button"
+            }
+          >
+            Sell
+          </NavLink>
+        ) : (
+          <NavLink
+            to="/login"
+            className={({ isActive }) =>
+              isActive ? "nav-button active" : "nav-button"
+            }
+          >
+            Sign Up/Login
+          </NavLink>
+        )}
+
       </div>
     </nav>
   );

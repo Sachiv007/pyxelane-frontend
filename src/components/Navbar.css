@@ -108,13 +108,26 @@
   }
 
   /* Top row: logo + search bar on same line */
+  @media (max-width: 599px) {
   .navbar-top-row {
     display: flex;
     align-items: center;
     width: 100%;
-    gap: 10px;
+    gap: 6px;           /* smaller gap between logo and search bar */
     margin-bottom: 10px;
   }
+
+   .navbar-center {
+    flex: 1;             /* fills remaining space */
+    max-width: calc(100% - 60px - 6px); /* prevent overflow: 60px logo + gap */
+    position: relative;
+    transform: none;
+    margin: 0;
+  }
+  .search-bar {
+    width: 100%;
+  }
+}
 
   .navbar-center {
     position: relative;
@@ -135,4 +148,6 @@
     gap: 8px;
     flex-wrap: nowrap;
   }
+
+  
 }

@@ -46,7 +46,8 @@ export default function Home({ searchTerm = "" }) {
       p.description?.toLowerCase().includes(safeSearch)
   );
 
-  if (loading) return <p>Loading products...</p>;
+  // Number of skeleton cards to show while loading
+  const skeletonCount = 6;
 
   return (
     <div className="home-container">
@@ -55,21 +56,27 @@ export default function Home({ searchTerm = "" }) {
 
       <h2>Latest Products</h2>
       <div className="products-grid">
-        {filteredProducts.length > 0 ? (
-          filteredProducts.map((product) => (
-            <div key={product.id} className="product-card">
-              <Link to={`/product/${product.id}`}>
-                {product.preview_url && (
-                  <img src={product.preview_url} alt={product.title} />
-                )}
-                <h3>{product.title}</h3>
-                <p>${product.price}</p>
-              </Link>
-            </div>
-          ))
-        ) : (
-          <p>No products found.</p>
-        )}
+        {loading
+          ? Array.from({ length: skeletonCount }).map((_, idx) => (
+              <div key={idx} className="product-card skeleton-card">
+                <div className="skeleton-image"></div>
+                <div className="skeleton-title"></div>
+                <div className="skeleton-price"></div>
+              </div>
+            ))
+          : filteredProducts.length > 0
+          ? filteredProducts.map((product) => (
+              <div key={product.id} className="product-card">
+                <Link to={`/product/${product.id}`}>
+                  {product.preview_url && (
+                    <img src={product.preview_url} alt={product.title} />
+                  )}
+                  <h3>{product.title}</h3>
+                  <p>${product.price}</p>
+                </Link>
+              </div>
+            ))
+          : <p>No products found.</p>}
       </div>
     </div>
   );

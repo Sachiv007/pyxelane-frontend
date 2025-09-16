@@ -1,26 +1,29 @@
 /* Navbar container */
 .navbar {
-  position: relative; /* for absolute search bar */
+  position: relative; /* for absolute search bar on desktop */
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 10px 20px;
   background-color: white;
-  border-bottom: 1px solid #ddd;
+  border-bottom: 1px solid black;
   z-index: 1000;
+  flex-wrap: nowrap; /* default, no wrap on desktop */
 }
 
 /* Logo */
 .navbar-logo {
   display: flex;
   align-items: center;
+  z-index: 1001; /* make sure logo stays above search bar */
 }
+
 .logo-image {
   width: 50px;
   height: 50px;
   border-radius: 50%;
   object-fit: cover;
-  border: 2px solid teal;
+  border: 2px solid #14b0bc;
 }
 
 /* Center search bar */
@@ -29,13 +32,15 @@
   left: 50%;
   transform: translateX(-50%);
   width: 100%;
-  max-width: 400px; /* slightly bigger */
+  max-width: 400px; /* desktop size */
+  z-index: 1000;
 }
+
 .search-bar {
   width: 100%;
-  padding: 8px 14px; /* slightly bigger padding */
-  border-radius: 25px; /* more rounded like Etsy */
-  border: 1px solid black; /* changed to black border */
+  padding: 8px 14px;
+  border-radius: 25px;
+  border: 1px solid black;
   font-size: 14px;
 }
 
@@ -44,23 +49,27 @@
   display: flex;
   align-items: center;
   gap: 10px;
+  z-index: 1001; /* above search bar */
 }
 
 .nav-button {
   text-decoration: none;
-  color: black;
-  padding: 6px 12px; /* smaller padding */
-  min-width: 60px;   /* smaller width */
+  color: black;              /* default text color */
+  padding: 6px 12px;         
+  min-width: 60px;           
   text-align: center;
-  border-radius: 25px; /* fully rounded corners */
-  border: 1px solid #ddd;
-  background-color: white;
+  border-radius: 25px;       
+  border: 1px solid black;   /* default border */
+  background-color: white;   
   transition: all 0.2s;
-  font-size: 13px; /* smaller font */
+  font-size: 13px;           
 }
 
 .nav-button:hover {
+  background-color: #14b0bc; /* main teal on hover */
+  color: white;              /* text turns white on hover */
   box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  border: 1px solid #14b0bc; /* border matches hover background */
 }
 
 .cart-link {
@@ -71,10 +80,40 @@
   position: absolute;
   top: -5px;
   right: -10px;
-  background-color: teal;
+  background-color: #14b0bc;
   color: white;
   border-radius: 50%;
   padding: 2px 6px;
   font-size: 12px;
 }
 
+/* Responsive adjustments */
+@media (max-width: 899px) {
+  .navbar-center {
+    max-width: 300px; /* smaller on tablets */
+  }
+}
+
+@media (max-width: 599px) {
+  .navbar {
+    flex-wrap: wrap; /* allow stacking on mobile */
+    padding: 10px;
+  }
+
+  .navbar-center {
+    position: relative;   /* remove absolute positioning */
+    transform: none;      /* reset translation */
+    width: 100%;          /* full width */
+    max-width: none;
+    margin-top: 10px;     /* spacing below logo */
+    order: 2;             /* appears below logo */
+  }
+
+  .navbar-right {
+    order: 3;             /* buttons appear below search bar */
+    margin-top: 10px;
+    width: 100%;
+    justify-content: center; /* center buttons */
+    gap: 8px;
+  }
+}

@@ -65,6 +65,7 @@ const Navbar = ({ onSearch, searchTerm }) => {
           </NavLink>
         )}
 
+{/*
         <NavLink
           to="/cart"
           className={({ isActive }) =>
@@ -76,6 +77,7 @@ const Navbar = ({ onSearch, searchTerm }) => {
             <span className="cart-badge">{cartItems.length}</span>
           )}
         </NavLink>
+*/}
 
         <NavLink
           to="/about"

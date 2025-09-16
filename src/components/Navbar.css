@@ -10,27 +10,6 @@
   z-index: 1000;
 }
 
-/* Desktop: keep navbar-center absolute */
-.navbar-center {
-  position: absolute;
-  left: 50%;
-  top: 50%;                 /* center vertically */
-  transform: translate(-50%, -50%);
-  width: 100%;
-  max-width: 400px;
-  z-index: 1000;
-}
-
-/* Search bar styling */
-.search-bar {
-  width: 100%;
-  padding: 8px 14px;
-  border-radius: 25px;
-  border: 1px solid black;
-  font-size: 14px;
-  box-sizing: border-box;
-}
-
 /* Logo */
 .navbar-logo {
   display: flex;
@@ -46,6 +25,26 @@
   border: 2px solid #14b0bc;
 }
 
+/* Center search bar (desktop) */
+.navbar-center {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  width: 100%;
+  max-width: 400px;
+  z-index: 1000;
+}
+
+.search-bar {
+  width: 100%;
+  padding: 8px 14px;
+  border-radius: 25px;
+  border: 1px solid black;
+  font-size: 14px;
+  box-sizing: border-box;
+}
+
 /* Right buttons */
 .navbar-right {
   display: flex;
@@ -54,7 +53,6 @@
   z-index: 1001;
 }
 
-/* Buttons hover effect */
 .nav-button {
   text-decoration: none;
   color: black;
@@ -108,46 +106,37 @@
   }
 
   /* Top row: logo + search bar on same line */
-  @media (max-width: 599px) {
   .navbar-top-row {
     display: flex;
     align-items: center;
     width: 100%;
-    gap: 6px;           /* smaller gap between logo and search bar */
+    gap: 8px;
     margin-bottom: 10px;
   }
 
-   .navbar-center {
-    flex: 1;             /* fills remaining space */
-    max-width: calc(100% - 60px - 6px); /* prevent overflow: 60px logo + gap */
-    position: relative;
-    transform: none;
-    margin: 0;
+  .navbar-logo {
+    flex: 0 0 auto; /* logo keeps its size */
   }
-  .search-bar {
-    width: 100%;
-  }
-}
 
   .navbar-center {
+    flex: 1 1 auto;  /* search bar fills remaining space */
+    min-width: 0;    /* allow shrinking to fit container */
     position: relative;
     transform: none;
-    flex: 1;          /* search bar fills remaining space */
-    max-width: none;
     margin: 0;
   }
 
   .search-bar {
     width: 100%;
+    box-sizing: border-box;
   }
 
   /* Buttons row below */
   .navbar-right {
+    order: 2;
     width: 100%;
     justify-content: center;
     gap: 8px;
     flex-wrap: nowrap;
   }
-
-  
 }

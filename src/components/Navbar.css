@@ -1,12 +1,12 @@
 /* Navbar container */
 .navbar {
+  position: relative;
   display: flex;
   align-items: center;
   justify-content: space-between;
   padding: 10px 20px;
   background-color: white;
   border-bottom: 1px solid black;
-  flex-wrap: wrap; /* allow wrapping on small screens */
   z-index: 1000;
 }
 
@@ -25,15 +25,18 @@
   border: 2px solid #14b0bc;
 }
 
-/* Center search bar */
+/* Center search bar (desktop) */
 .navbar-center {
-  flex: 1 1 200px; /* flexible: grows and shrinks, minimum 200px */
-  margin: 0 10px;
-  order: 2;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 100%;
+  max-width: 400px; /* desktop max width */
+  z-index: 1000;
 }
 
 .search-bar {
-  width: 100%; /* fills the flex container */
+  width: 100%;
   padding: 8px 14px;
   border-radius: 25px;
   border: 1px solid black;
@@ -46,7 +49,7 @@
   display: flex;
   align-items: center;
   gap: 10px;
-  order: 3;
+  z-index: 1001;
 }
 
 .nav-button {
@@ -85,35 +88,36 @@
 }
 
 /* Responsive adjustments */
+
+/* Tablets */
 @media (max-width: 899px) {
   .navbar-center {
-    flex: 1 1 150px; /* slightly smaller on tablets */
+    max-width: 300px; /* slightly smaller on tablets */
   }
 }
 
+/* Mobile */
 @media (max-width: 599px) {
   .navbar {
-    flex-direction: column;
-    align-items: stretch;
-    padding: 10px;
-  }
-
-  .navbar-logo {
-    order: 1;
-    margin-bottom: 10px;
+    flex-wrap: nowrap; /* keep logo + searchbar on same line */
   }
 
   .navbar-center {
-    order: 2;
-    flex: 1 1 auto; /* flexible width, fills container */
-    margin: 0 0 10px 0;
+    position: relative;   /* remove absolute positioning */
+    transform: none;
+    flex: 1;              /* search bar fills remaining space next to logo */
+    max-width: none;
+    margin-left: 10px;    /* space between logo and search bar */
+  }
+
+  .search-bar {
+    width: 100%;          /* fills flex container */
   }
 
   .navbar-right {
-    order: 3;
-    justify-content: center;
+    flex-wrap: wrap;       /* buttons can wrap if not enough space */
+    justify-content: flex-end;
     gap: 8px;
-    width: 100%;
-    flex-wrap: wrap;
+    margin-top: 5px;       /* small spacing if wrapped */
   }
 }

@@ -39,10 +39,10 @@ export default function SignUp() {
   };
 
   return (
-    <div className="signup-container">
-      <div className="signup-box">
+    <div className="login-container">
+      <div className="login-box">
         <h2>Create Your Account</h2>
-        <form className="signup-form" onSubmit={handleSignUp}>
+        <form className="login-form" onSubmit={handleSignUp}>
           <input
             type="text"
             placeholder="Choose a username"
@@ -64,7 +64,7 @@ export default function SignUp() {
             onChange={(e) => setPassword(e.target.value)}
             required
           />
-          <button type="submit" className="button" disabled={loading}>
+          <button type="submit" className="back-button" disabled={loading}>
             {loading ? 'Signing Up...' : 'Sign Up'}
           </button>
         </form>

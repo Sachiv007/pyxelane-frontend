@@ -177,5 +177,6 @@ html, body {
     padding: 0 var(--mobile-side-pad);
     box-sizing: border-box;
     flex-wrap: nowrap;
+    margin-top: 10px;
   }
 }

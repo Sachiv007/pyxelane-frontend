@@ -8,6 +8,8 @@
   background-color: white;
   border-bottom: 1px solid black;
   z-index: 1000;
+  box-sizing: border-box;      /* important for consistent sizing */
+  overflow-x: hidden;          /* prevents accidental horizontal overflow */
 }
 
 /* Logo */
@@ -23,6 +25,7 @@
   border-radius: 50%;
   object-fit: cover;
   border: 2px solid #14b0bc;
+  display: block;
 }
 
 /* Center search bar (desktop) */
@@ -99,45 +102,56 @@
 
 /* Mobile */
 @media (max-width: 599px) {
+  /* keep navbar vertical stacking but top row will hold logo + search on one line */
   .navbar {
     flex-direction: column;
     align-items: stretch;
     padding: 10px;
   }
 
-  /* Top row: logo + search bar */
+  /* top row: logo + search */
   .navbar-top-row {
     display: flex;
     align-items: center;
     width: 100%;
-    gap: 6px;
+    gap: 6px;                 /* small gap between logo and search */
     margin-bottom: 10px;
+    padding: 0 6px;           /* account for navbar padding and avoid overflow */
+    box-sizing: border-box;
   }
 
   .navbar-logo {
-    flex: 0 0 auto;
+    flex: 0 0 auto;           /* logo keeps its size */
   }
 
+  /* ensure the search can shrink and never overflow viewport */
   .navbar-center {
-    flex: 1 1 auto;
-    min-width: 0;
+    flex: 1 1 auto;           /* fills remaining space next to logo */
+    min-width: 0;             /* ALLOWS shrinking in flexbox (critical) */
     position: relative;
     transform: none;
     margin: 0;
-    max-width: 100%;      /* prevent stretching */
+    /* Calculate a strict max so the search never stretches beyond the viewport:
+       100vw minus navbar horizontal padding (10px left + 10px right) minus logo width (50px) minus gap (6px).
+       This prevents overflow across different devices while keeping layout intact. */
+    max-width: calc(100vw - 20px - 50px - 6px);
+    box-sizing: border-box;
   }
 
   .search-bar {
     width: 100%;
-    max-width: 100%;      /* keeps it inside screen */
+    max-width: 100%;
     box-sizing: border-box;
   }
 
-  /* Buttons row below */
+  /* buttons row below */
   .navbar-right {
+    order: 2;
     width: 100%;
     justify-content: center;
     gap: 8px;
     flex-wrap: nowrap;
+    padding: 0 6px;           /* match top-row padding so buttons line up */
+    box-sizing: border-box;
   }
 }

@@ -110,25 +110,26 @@
     display: flex;
     align-items: center;
     width: 100%;
-    gap: 6px; /* small gap between logo and search bar */
+    gap: 6px;
     margin-bottom: 10px;
   }
 
   .navbar-logo {
-    flex: 0 0 auto; /* logo keeps its size */
+    flex: 0 0 auto;
   }
 
   .navbar-center {
-    flex: 1 1 auto; /* search bar grows and shrinks */
-    min-width: 0;   /* allows shrinking inside flex container */
+    flex: 1 1 auto;
+    min-width: 0;
     position: relative;
     transform: none;
     margin: 0;
+    max-width: 100%;      /* prevent stretching */
   }
 
   .search-bar {
     width: 100%;
-    max-width: 100%; /* ensures it never overflows */
+    max-width: 100%;      /* keeps it inside screen */
     box-sizing: border-box;
   }
 

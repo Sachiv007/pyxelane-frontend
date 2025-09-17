@@ -30,6 +30,7 @@
   display: flex;
   flex-direction: column;
   gap: 1rem;
+  align-items: center; /* Center align all form items */
 }
 
 .login-form input[type="email"],
@@ -60,6 +61,7 @@
   color: white;
   cursor: pointer;
   transition: background-color 0.2s ease, transform 0.1s ease;
+  width: 150px; /* fixed width for center alignment */
 }
 
 .login-form button[type="submit"]:hover {
@@ -90,17 +92,18 @@
   display: inline-block;
   padding: 6px 12px;
   background-color: #14b0bc;
-  color: white !important; /* Force white text */
+  color: white !important;
   border-radius: 6px;
   text-decoration: none;
   font-weight: bold;
   transition: background-color 0.2s ease, color 0.2s ease;
+  margin-top: 10px; /* spacing from form */
 }
 
 .signup-link:hover {
   background-color: #0f766e;
-  color: white !important; /* Keep text white */
-  text-decoration: none !important; /* Prevent underline */
+  color: white !important;
+  text-decoration: none !important;
 }
 
 /* Responsive adjustments */

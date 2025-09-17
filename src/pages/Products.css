@@ -8,49 +8,63 @@
   flex-direction: column;
   align-items: center;
   text-align: center;
+  font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
 }
 
 .products-container h1 {
   font-size: clamp(1.8rem, 4vw, 2.8rem);
   margin-bottom: 1.5rem;
+  color: #000;
 }
 
+/* Upload Button */
 .upload-btn {
-  padding: 0.5rem 1rem;
-  background-color: #6C63FF;
-  color: #fff;
+  padding: 8px 12px;
+  background-color: #14b0bc; /* teal */
+  color: white;
   text-decoration: none;
   border-radius: 6px;
   font-size: 0.95rem;
-  transition: background-color 0.3s ease;
+  border: 2px solid black;
+  transition: all 0.3s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100px; /* same width as edit/delete */
+  height: 36px; /* same height */
+  text-align: center;
 }
 
 .upload-btn:hover {
-  background-color: #4b47cc;
+  background-color: #0f766e;
+  border-color: #0f766e;
+  color: white; /* prevents purple text */
 }
 
+/* Products Grid */
 .products-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 20px;
   width: 100%;
 }
 
-.products-grid.four-columns {
-  grid-template-columns: repeat(4, 1fr);
-}
-
+/* Product Card */
 .product-card {
-  border: 1px solid #ddd;
+  border: 2px solid black;
   padding: 15px;
   border-radius: 8px;
   background: #fff;
   transition: box-shadow 0.2s;
   text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 350px;
 }
 
 .product-card:hover {
-  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }
 
 .product-card img {
@@ -59,16 +73,21 @@
   object-fit: cover;
   border-radius: 8px;
   display: block;
+  border: 2px solid black;
+  margin-bottom: 10px;
 }
 
 .product-card h3 {
   margin: 10px 0 5px;
   font-size: 1.1rem;
+  color: #000;
 }
 
-.product-card p {
+.product-card p,
+.product-description {
   margin: 0;
   font-size: 0.95rem;
+  color: #222;
 }
 
 .product-description {
@@ -77,30 +96,93 @@
   margin: 10px 0;
 }
 
+/* Buttons Wrapper */
+.product-card .buttons-wrapper {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: auto;
+}
+
+/* Buttons */
 .edit-btn, .delete-btn {
-  display: inline-block;
-  margin-top: 8px;
-  padding: 6px 12px;
-  border-radius: 5px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 12px;
+  border-radius: 6px;
   text-decoration: none;
   cursor: pointer;
+  font-weight: 500;
+  border: 2px solid black; /* black border for both buttons */
+  width: 100px;
+  height: 36px;
+  text-align: center;
+  font-size: 0.9rem;
+  color: white;
+  transition: all 0.2s ease;
+  box-sizing: border-box;
 }
 
 .edit-btn {
-  background-color: #007bff;
-  color: white;
+  background-color: #14b0bc; /* teal */
 }
 
 .edit-btn:hover {
-  background-color: #0056b3;
+  background-color: #0f766e; /* darker teal */
+  border-color: #0f766e;
+  color: white;
 }
 
 .delete-btn {
-  background-color: red;
-  color: white;
-  border: none;
+  background-color: #c53030; /* red */
 }
 
 .delete-btn:hover {
-  background-color: darkred;
+  background-color: #c53030; /* stays same on hover */
+  border-color: black; /* keeps black border */
+  color: white;
+}
+
+/* Responsive Adjustments */
+@media (max-width: 768px) {
+  .products-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .product-card img {
+    height: 150px;
+  }
+
+  .upload-btn {
+    width: 100px;
+    font-size: 0.9rem;
+    padding: 8px 10px;
+  }
+
+  .edit-btn, .delete-btn {
+    width: 90px;
+    font-size: 0.85rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .products-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .product-card img {
+    height: 120px;
+  }
+
+  .upload-btn {
+    width: 80px;
+    font-size: 0.85rem;
+    padding: 6px 8px;
+  }
+
+  .edit-btn, .delete-btn {
+    width: 80px;
+    font-size: 0.8rem;
+  }
 }

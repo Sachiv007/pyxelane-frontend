@@ -87,7 +87,7 @@ const Navbar = ({ onSearch, searchTerm }) => {
               isActive ? "nav-button active" : "nav-button"
             }
           >
-            Sign Up/Login
+            Sign Up
           </NavLink>
         )}
       </div>

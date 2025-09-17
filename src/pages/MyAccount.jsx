@@ -2,17 +2,16 @@ import React, { useState, useEffect, useCallback, useContext } from 'react';
 import { supabase } from '../supabaseClient';
 import Cropper from 'react-easy-crop';
 import { UserContext } from '../contexts/UserContext';
+import './MyAccount.css';
 
 export default function MyAccount() {
-  const { refreshAvatar } = useContext(UserContext); // <-- added
+  const { refreshAvatar } = useContext(UserContext);
   const [user, setUser] = useState(null);
   const [username, setUsername] = useState("");
   const [newUsername, setNewUsername] = useState("");
-
   const [image, setImage] = useState(null);
   const [preview, setPreview] = useState(null);
   const [avatarUrl, setAvatarUrl] = useState(null);
-
   const [crop, setCrop] = useState({ x: 0, y: 0 });
   const [zoom, setZoom] = useState(1);
   const [croppedAreaPixels, setCroppedAreaPixels] = useState(null);
@@ -29,7 +28,6 @@ export default function MyAccount() {
         const { data, error } = await supabase.storage
           .from('avatars')
           .createSignedUrl(user.user_metadata.avatar_path, 60 * 60);
-
         if (!error) setAvatarUrl(data.signedUrl);
       }
     }
@@ -52,10 +50,8 @@ export default function MyAccount() {
       image.onload = () => {
         const canvas = document.createElement('canvas');
         const ctx = canvas.getContext('2d');
-
         canvas.width = cropPixels.width;
         canvas.height = cropPixels.height;
-
         ctx.drawImage(
           image,
           cropPixels.x,
@@ -67,7 +63,6 @@ export default function MyAccount() {
           cropPixels.width,
           cropPixels.height
         );
-
         canvas.toBlob((blob) => {
           if (!blob) return reject(new Error('Canvas is empty'));
           resolve(blob);
@@ -85,7 +80,6 @@ export default function MyAccount() {
     if (!preview || !croppedAreaPixels) return;
     const croppedBlob = await getCroppedImg(preview, croppedAreaPixels);
     const croppedFile = new File([croppedBlob], "avatar.jpg", { type: "image/jpeg" });
-
     setImage(croppedFile);
     setPreview(URL.createObjectURL(croppedFile));
     setShowCropper(false);
@@ -93,84 +87,62 @@ export default function MyAccount() {
 
   const uploadProfilePicture = async () => {
     if (!image || !user) return;
-    const { data: existingFiles } = await supabase.storage
-      .from('avatars')
-      .list(user.id + "/");
-
+    const { data: existingFiles } = await supabase.storage.from('avatars').list(user.id + "/");
     if (existingFiles?.length > 0) {
       const oldFilePaths = existingFiles.map(f => `${user.id}/${f.name}`);
       await supabase.storage.from('avatars').remove(oldFilePaths);
     }
 
     const filePath = `${user.id}/profile.jpg`;
-    const { error: uploadError } = await supabase.storage
-      .from('avatars')
-      .upload(filePath, image, { upsert: true });
+    const { error: uploadError } = await supabase.storage.from('avatars').upload(filePath, image, { upsert: true });
     if (uploadError) return alert('Upload failed: ' + uploadError.message);
 
-    const { error: updateError } = await supabase.auth.updateUser({
-      data: { avatar_path: filePath }
-    });
+    const { error: updateError } = await supabase.auth.updateUser({ data: { avatar_path: filePath } });
     if (updateError) return alert('Failed to update user profile: ' + updateError.message);
 
-    const { data } = await supabase.storage
-      .from('avatars')
-      .createSignedUrl(filePath, 60 * 60);
+    const { data } = await supabase.storage.from('avatars').createSignedUrl(filePath, 60 * 60);
     setAvatarUrl(data.signedUrl);
     setPreview(null);
     setImage(null);
-
-    refreshAvatar(); // <-- triggers immediate update in Navbar and Home
-
+    refreshAvatar();
     alert('Profile picture uploaded successfully!');
   };
 
   const updateUsername = async () => {
     if (!newUsername || !user) return;
-
-    const { error } = await supabase.auth.updateUser({
-      data: { username: newUsername }
-    });
-
-    if (error) {
-      alert("Failed to update username: " + error.message);
-    } else {
-      setUsername(newUsername);
-      alert("Username updated successfully!");
-    }
+    const { error } = await supabase.auth.updateUser({ data: { username: newUsername } });
+    if (error) alert("Failed to update username: " + error.message);
+    else { setUsername(newUsername); alert("Username updated successfully!"); }
   };
 
   return (
-    <div style={styles.container}>
+    <div className="account-container">
       <h1>My Account</h1>
 
-      <div style={styles.avatarWrapper}>
-        {avatarUrl && !preview && <img src={avatarUrl} alt="Profile" style={styles.avatar} />}
-        {preview && <img src={preview} alt="Preview" style={styles.avatar} />}
+      <div className="avatar-wrapper">
+        {avatarUrl && !preview && <img src={avatarUrl} alt="Profile" className="avatar" />}
+        {preview && <img src={preview} alt="Preview" className="avatar" />}
       </div>
 
-      <input type="file" accept="image/*" onChange={handleImageChange} style={styles.fileInput} />
-      <button onClick={uploadProfilePicture} disabled={!image} style={styles.button}>
+      {/* Hidden file input */}
+      <input type="file" accept="image/*" id="avatarInput" onChange={handleImageChange} />
+      {/* Label styled as button */}
+      <label htmlFor="avatarInput" className="choose-file-label">
+        Choose New Profile Pic
+      </label>
+      <button onClick={uploadProfilePicture} disabled={!image}>
         Upload New Profile Picture
       </button>
 
-      {/* Username section */}
-      <div style={{ marginTop: "2rem", width: "100%", maxWidth: 300 }}>
-        <label style={{ display: "block", marginBottom: "0.5rem" }}>Username</label>
-        <input
-          type="text"
-          value={newUsername}
-          onChange={(e) => setNewUsername(e.target.value)}
-          style={styles.input}
-        />
-        <button onClick={updateUsername} style={styles.button}>
-          Save Username
-        </button>
+      <div className="username-section">
+        <label>Username</label>
+        <input type="text" value={newUsername} onChange={(e) => setNewUsername(e.target.value)} />
+        <button onClick={updateUsername}>Save Username</button>
       </div>
 
       {showCropper && (
-        <div style={styles.cropperOverlay}>
-          <div id="cropper-box" style={styles.cropperContainer}>
+        <div className="cropper-overlay">
+          <div className="cropper-container">
             <Cropper
               image={preview}
               crop={crop}
@@ -182,8 +154,7 @@ export default function MyAccount() {
               onZoomChange={setZoom}
               onCropComplete={onCropComplete}
             />
-
-            <div style={styles.controls}>
+            <div className="cropper-controls">
               <button onClick={() => setShowCropper(false)}>Cancel</button>
               <button onClick={saveCroppedImage}>Save</button>
             </div>
@@ -193,15 +164,3 @@ export default function MyAccount() {
     </div>
   );
 }
-
-const styles = {
-  container: { display: 'flex', flexDirection: 'column', alignItems: 'center', padding: '2rem' },
-  avatarWrapper: { width: 100, height: 100, borderRadius: '50%', overflow: 'hidden', marginBottom: '1rem', border: '2px solid #ccc', display: 'flex', justifyContent: 'center', alignItems: 'center' },
-  avatar: { width: '100%', height: '100%', objectFit: 'cover' },
-  fileInput: { marginBottom: '1rem' },
-  input: { width: '100%', padding: '0.5rem', marginBottom: '1rem', border: '1px solid #ccc', borderRadius: 5 },
-  button: { padding: '0.5rem 1rem', backgroundColor: '#007bff', color: '#fff', border: 'none', borderRadius: 5, cursor: 'pointer', marginBottom: "1rem" },
-  cropperOverlay: { position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, backgroundColor: 'rgba(0,0,0,0.7)', display: 'flex', justifyContent: 'center', alignItems: 'center' },
-  cropperContainer: { position: 'relative', width: 300, height: 300, background: '#fff', borderRadius: 10, overflow: 'hidden' },
-  controls: { position: 'absolute', bottom: 10, left: 0, right: 0, display: 'flex', justifyContent: 'space-around' },
-};

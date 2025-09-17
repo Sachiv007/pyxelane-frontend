@@ -101,17 +101,21 @@ export default function Products() {
                   <p className="product-description">{product.description}</p>
                 )}
 
-                <Link to={`/user/edit-product/${product.id}`} className="edit-btn">
-                  Edit
-                </Link>
-                <br />
-                <button
-                  className="delete-btn"
-                  onClick={() => handleDelete(product)}
-                  disabled={isDeleting}
-                >
-                  {isDeleting ? "Deleting..." : "Delete"}
-                </button>
+                <div className="buttons-wrapper">
+                  <Link
+                    to={`/user/edit-product/${product.id}`}
+                    className="edit-btn"
+                  >
+                    Edit
+                  </Link>
+                  <button
+                    className="delete-btn"
+                    onClick={() => handleDelete(product)}
+                    disabled={isDeleting}
+                  >
+                    {isDeleting ? "Deleting..." : "Delete"}
+                  </button>
+                </div>
               </div>
             );
           })

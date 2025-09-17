@@ -22,7 +22,7 @@ html, body {
   justify-content: space-between;
   padding: 10px var(--desktop-side-pad);
   background-color: white;
-  border-bottom: 1px solid black;
+  border-bottom: 2px solid black;
   z-index: 1000;
   box-sizing: border-box;
 }
@@ -73,7 +73,7 @@ html, body {
   width: 100%;
   padding: 8px 14px;
   border-radius: 25px;
-  border: 1px solid black;
+  border: 2px solid black;
   font-size: 14px;
   box-sizing: border-box;
   display: block;
@@ -96,7 +96,7 @@ html, body {
   min-width: 60px;
   text-align: center;
   border-radius: 25px;
-  border: 1px solid black;
+  border: 2px solid black;
   background-color: white;
   transition: all 0.2s;
   font-size: 13px;

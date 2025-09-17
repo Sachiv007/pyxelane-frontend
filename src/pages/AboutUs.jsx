@@ -6,7 +6,7 @@ export default function AboutUs() {
     <div className="about-container">
       <h1>About Pyxelane</h1>
       <p>
-        Founded on <strong>September 17, 2025</strong>, by <strong>Sachiv Ray</strong> at the young age of 15, our platform was created with one clear vision: to make selling online simple, accessible, and community-driven.
+        Founded on <strong>September 17, 2025</strong>, by <strong>Sachiv Ray</strong> at the young age of 16, our platform was created with one clear vision: to make selling online simple, accessible, and community-driven.
       </p>
       <p>
         This is not just another marketplace—it’s a place where sellers and buyers connect, share, and grow together. We believe that behind every product is a story, and behind every seller is a dream worth supporting. That’s why we’ve built a space where creativity and entrepreneurship can thrive.

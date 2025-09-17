@@ -1,17 +1,17 @@
-/* ======= Navbar (FULL) ======= */
-
-/* safe reset to avoid page-level overflow */
-body {
-  margin: 0;
-  box-sizing: border-box;
-}
-
-/* CSS variables for easy tuning */
 :root{
   --logo-size: 50px;
-  --desktop-side-pad: 20px; /* navbar left/right padding on desktop */
-  --mobile-side-pad: 10px;  /* navbar left/right padding on mobile */
-  --toprow-gap: 6px;        /* gap between logo and search on mobile */
+  --desktop-side-pad: 20px;
+  --mobile-side-pad: 10px;
+  --gap: 8px;
+  --teal: #14b0bc;
+}
+
+/* Prevent page-level overflow which often breaks mobile layout */
+html, body {
+  margin: 0;
+  width: 100%;
+  overflow-x: hidden;
+  box-sizing: border-box;
 }
 
 /* Navbar container */
@@ -20,14 +20,21 @@ body {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 10px var(--desktop-side-pad); /* uses desktop pad by default */
+  padding: 10px var(--desktop-side-pad);
   background-color: white;
   border-bottom: 1px solid black;
   z-index: 1000;
   box-sizing: border-box;
-  overflow-x: hidden; /* prevents accidental horizontal scroll */
-  /* make --nav-side-pad available here, overridden in mobile media query */
-  --nav-side-pad: var(--desktop-side-pad);
+}
+
+/* Top-row wrapper (you must wrap logo + search in this element) */
+.navbar-top-row {
+  /* default: lets desktop flow naturally; mobile overrides to grid */
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: var(--gap);
+  box-sizing: border-box;
 }
 
 /* Logo */
@@ -35,8 +42,10 @@ body {
   display: flex;
   align-items: center;
   z-index: 1001;
-  /* make logo a known fixed size in the layout */
-  flex: 0 0 var(--logo-size);
+  flex: 0 0 var(--logo-size);   /* fixed footprint so calculations are stable */
+  min-width: var(--logo-size);
+  max-width: var(--logo-size);
+  box-sizing: border-box;
 }
 
 .logo-image {
@@ -44,19 +53,20 @@ body {
   height: var(--logo-size);
   border-radius: 50%;
   object-fit: cover;
-  border: 2px solid #14b0bc;
+  border: 2px solid var(--teal);
   display: block;
 }
 
-/* Center search bar (desktop) - absolutely centered inside navbar */
+/* Center search bar (desktop: absolutely centered in navbar) */
 .navbar-center {
   position: absolute;
   left: 50%;
   top: 50%;
   transform: translate(-50%, -50%);
   width: 100%;
-  max-width: 400px; /* desktop max width - unchanged */
+  max-width: 400px; /* desktop max width */
   z-index: 1000;
+  box-sizing: border-box;
 }
 
 .search-bar {
@@ -67,6 +77,7 @@ body {
   font-size: 14px;
   box-sizing: border-box;
   display: block;
+  -webkit-appearance: none;
 }
 
 /* Right buttons */
@@ -75,6 +86,7 @@ body {
   align-items: center;
   gap: 10px;
   z-index: 1001;
+  box-sizing: border-box;
 }
 
 .nav-button {
@@ -91,71 +103,61 @@ body {
 }
 
 .nav-button:hover {
-  background-color: #14b0bc;
+  background-color: var(--teal);
   color: white;
   box-shadow: 0 2px 6px rgba(0,0,0,0.15);
-  border: 1px solid #14b0bc;
+  border: 1px solid var(--teal);
 }
 
-.cart-link {
-  position: relative;
-}
-
+.cart-link { position: relative; }
 .cart-badge {
   position: absolute;
   top: -5px;
   right: -10px;
-  background-color: #14b0bc;
+  background-color: var(--teal);
   color: white;
   border-radius: 50%;
   padding: 2px 6px;
   font-size: 12px;
 }
 
-/* Tablet adjustments (keeps desktop behavior) */
+/* Tablet tweak */
 @media (max-width: 899px) {
-  .navbar-center {
-    max-width: 300px;
-  }
+  .navbar-center { max-width: 300px; }
 }
 
-/* ---------------- Mobile: logo + search on one line, buttons below ---------------- */
+/* ---------------------- Mobile: final, robust layout ---------------------- */
+/* Logo + search should be on same line, search fits; buttons row below */
 @media (max-width: 599px) {
-  /* use smaller side padding on mobile */
   .navbar {
     padding: 10px var(--mobile-side-pad);
-    --nav-side-pad: var(--mobile-side-pad);
-    flex-direction: column;     /* keep two-row layout: top-row + buttons row */
+    flex-direction: column;
     align-items: stretch;
   }
 
-  /* Top row wrapper: logo + search (you must wrap them in .navbar-top-row in markup) */
   .navbar-top-row {
-    display: flex;
+    display: grid;
+    grid-template-columns: var(--logo-size) 1fr; 
+    column-gap: var(--gap);
     align-items: center;
-    /* make top-row width exactly the inner width of the navbar (account for navbar side padding) */
-    width: calc(100% - (var(--nav-side-pad) * 2));
-    margin: 0 var(--nav-side-pad);
-    gap: var(--toprow-gap);
+    /* ✅ remove width + margin that caused overflow */
+    width: 100%;
     box-sizing: border-box;
-    overflow: hidden; /* ensure nothing bleeds out */
+    overflow: hidden;
   }
 
-  /* keep logo fixed inside top-row */
   .navbar-logo {
+    justify-self: start;
     flex: 0 0 var(--logo-size);
     min-width: var(--logo-size);
   }
 
-  /* make search truly flexible and shrinkable and never overflow the top-row */
   .navbar-center {
-    flex: 1 1 auto; /* fill remaining space */
-    min-width: 0;   /* CRITICAL: allow the item to shrink inside a flex container */
-    position: relative;
+    position: static;
     transform: none;
     margin: 0;
-    /* strict max: top-row width minus logo and gap (prevents overflow) */
-    max-width: calc(100% - var(--logo-size) - var(--toprow-gap));
+    max-width: 100%;   /* ✅ prevent stretching beyond screen */
+    min-width: 0;      
     box-sizing: border-box;
     overflow: hidden;
   }
@@ -164,16 +166,16 @@ body {
     width: 100%;
     max-width: 100%;
     box-sizing: border-box;
+    overflow: hidden;
   }
 
-  /* Buttons row below: full width and centered */
   .navbar-right {
     order: 2;
     width: 100%;
     justify-content: center;
     gap: 8px;
-    flex-wrap: nowrap;
-    padding: 0 var(--nav-side-pad); /* align with top-row horizontally */
+    padding: 0 var(--mobile-side-pad);
     box-sizing: border-box;
+    flex-wrap: nowrap;
   }
 }

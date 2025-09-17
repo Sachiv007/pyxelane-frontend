@@ -14,6 +14,14 @@
   text-align: center; /* Keep heading centered */
 }
 
+.about-container h2 {
+  font-size: clamp(1.5rem, 3.5vw, 2rem);
+  color: teal; /* same accent color */
+  text-align: center; /* center Vision and Mission headings */
+  margin-top: 30px;
+  margin-bottom: 15px;
+}
+
 .about-container p {
   font-size: 1.1rem;
   line-height: 1.6;

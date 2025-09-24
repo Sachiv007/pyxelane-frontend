@@ -23,11 +23,11 @@ import ThankYou from "./pages/ThankYou";
 import Cart from "./pages/Cart";
 import MyStats from "./pages/MyStats";
 import AboutUs from "./pages/AboutUs";
+import ResetPassword from "./pages/ResetPassword";
 
 import { CartProvider } from "./contexts/CartContext";
 import { UserProvider } from "./contexts/UserContext";
 
-// Wrapper component
 function AppWrapper() {
   const navigate = useNavigate();
   const location = useLocation();
@@ -76,11 +76,9 @@ function AppWrapper() {
           <Route path="/about" element={<AboutUs />} />
           <Route path="/product/:id" element={<ProductDetails />} />
           <Route path="/cart" element={<Cart />} />
-
-          {/* Single ThankYou route for free downloads */}
           <Route path="/thank-you" element={<ThankYou />} />
+          <Route path="/reset-password" element={<ResetPassword />} />
 
-          {/* Protected user dashboard */}
           <Route
             path="/user"
             element={<ProtectedRoute><UserDashboard user={user} /></ProtectedRoute>}
@@ -92,7 +90,6 @@ function AppWrapper() {
             <Route path="mystats" element={<MyStats user={user} />} />
           </Route>
 
-          {/* Fallback */}
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>
       </UserProvider>
@@ -107,3 +104,4 @@ export default function App() {
     </Router>
   );
 }
+

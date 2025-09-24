@@ -46,7 +46,6 @@ export default function Home({ searchTerm = "" }) {
       p.description?.toLowerCase().includes(safeSearch)
   );
 
-  // Number of skeleton cards to show while loading
   const skeletonCount = 6;
 
   return (

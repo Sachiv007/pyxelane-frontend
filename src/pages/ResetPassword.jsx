@@ -9,27 +9,14 @@ export default function ResetPassword() {
   const [errorMsg, setErrorMsg] = useState("");
   const navigate = useNavigate();
 
-  const [accessToken, setAccessToken] = useState(null);
-
   useEffect(() => {
-    // Extract access_token from URL hash
-    const hash = window.location.hash;
-    if (hash.includes("access_token") && hash.includes("type=recovery")) {
-      const token = new URLSearchParams(hash.slice(1)).get("access_token");
-      setAccessToken(token);
-      // Set session so supabase knows the user
-      supabase.auth.setSession({ access_token: token });
-    }
+    // When Supabase sends reset link, it logs user in automatically
+    // No need to manually setSession here
   }, []);
 
   const handlePasswordReset = async (e) => {
     e.preventDefault();
     setErrorMsg("");
-
-    if (!accessToken) {
-      setErrorMsg("Invalid or expired reset link.");
-      return;
-    }
 
     if (password !== confirmPassword) {
       setErrorMsg("Passwords do not match.");
